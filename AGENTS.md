@@ -3,3 +3,47 @@
 
 This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
 <!-- END:nextjs-agent-rules -->
+
+<!-- BEGIN:project-overview -->
+# Sacrament Meeting Planner
+
+A minimal, reverent web application for LDS church leaders and members to organize and manage sacrament meetings.
+
+## Stack
+
+- **Framework**: Next.js 16 (App Router)
+- **Styling**: Tailwind CSS v4 (`@import "tailwindcss"` with `@theme inline` tokens)
+- **Fonts**: Inter (body), Lora (headings) via `next/font/google`
+
+## Design System
+
+- **Primary**: `#003366` — deep navy for headers and key actions
+- **Secondary**: `#A7B6C2` — soft steel blue for highlights and accents
+- **Background**: `#F9FAFB` — light neutral background
+- **Text**: `#2E2E2E` — dark gray for readability
+- **Accent**: `#CBB67C` — warm gold for subtle emphasis
+- **Border**: `#E5E7EB` — light gray borders
+- **Radii**: `6px` / `10px` / `16px` / `24px` (sm/md/lg/xl)
+- **Shadows**: soft, card, elevated — all subtle and muted
+- **Spacing**: `4/8/16/24/32/48px` scale
+
+## Key Files
+
+- `app/globals.css` — all design tokens, base styles, component classes, utilities
+- `app/layout.tsx` — root layout with font setup and metadata
+- `app/page.tsx` — home page
+
+## Commands
+
+- `npm run dev` — start dev server
+- `npm run build` — production build
+- `npm run start` — start production server
+
+## Guidelines
+
+- Keep UI minimal and uncluttered
+- All buttons and inputs must have rounded corners
+- Use consistent spacing and soft shadows
+- Tone should feel peaceful, organized, and spiritually aligned
+- Responsive for desktop and mobile
+<!-- END:project-overview -->
