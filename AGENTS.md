@@ -46,4 +46,8 @@ A minimal, reverent web application for LDS church leaders and members to organi
 - Use consistent spacing and soft shadows
 - Tone should feel peaceful, organized, and spiritually aligned
 - Responsive for desktop and mobile
+
+## Conventions
+
+- Use Tailwind utility classes for colors (`bg-white`, `border-border`, `text-foreground`, `bg-primary/10`, `bg-secondary/20`, etc.) instead of `var(--color-...)` — all design tokens are registered in `@theme inline` and available as Tailwind utilities.
 <!-- END:project-overview -->
