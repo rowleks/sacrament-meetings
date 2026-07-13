@@ -1,8 +1,17 @@
+import WelcomeBanner from './components/WelcomeBanner';
+import UpcomingMeetings from './components/UpcomingMeetings';
+import RecentAssignments from './components/RecentAssignments';
+import Directory from './components/Directory';
+
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center">
-      <h1 className="mb-2">Sacrament Meeting Planner</h1>
-      <p className="text-balance">Organize and manage sacrament meetings with reverence and clarity.</p>
+    <div className="mx-auto max-w-5xl px-4 py-8 space-y-8">
+      <WelcomeBanner />
+      <UpcomingMeetings />
+      <section className="grid gap-6 lg:grid-cols-5">
+        <RecentAssignments />
+        <Directory />
+      </section>
     </div>
   );
 }
