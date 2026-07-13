@@ -1,9 +1,33 @@
+import {
+  addWeeks,
+  compareAsc,
+  compareDesc,
+  isSameDay,
+  parseISO,
+} from 'date-fns';
+import {
+  getCurrentSunday,
+  getCurrentSundayString,
+  getNextSunday,
+  getPreviousSunday,
+  isTodaySunday,
+  toDateString,
+} from './dates';
 import type { MeetingType, SacramentMeeting } from './types';
+
+const sundayDates = [
+  toDateString(getPreviousSunday()),
+  toDateString(getCurrentSunday()),
+  toDateString(getNextSunday()),
+  toDateString(addWeeks(getCurrentSunday(), 2)),
+  toDateString(addWeeks(getCurrentSunday(), 3)),
+  toDateString(addWeeks(getCurrentSunday(), 4)),
+] as const;
 
 const meetings: SacramentMeeting[] = [
   {
     id: 1,
-    date: '2026-07-12',
+    date: sundayDates[0],
     meetingType: 'regular',
     presiding: 'Bishop Smith',
     conducting: 'Brother Johnson',
@@ -33,7 +57,7 @@ const meetings: SacramentMeeting[] = [
   },
   {
     id: 2,
-    date: '2026-07-19',
+    date: sundayDates[1],
     meetingType: 'testimony',
     presiding: 'Bishop Smith',
     conducting: 'Bishop Smith',
@@ -49,7 +73,7 @@ const meetings: SacramentMeeting[] = [
   },
   {
     id: 3,
-    date: '2026-07-26',
+    date: sundayDates[2],
     meetingType: 'regular',
     presiding: 'Bishop Smith',
     conducting: 'Brother Alvarez',
@@ -64,7 +88,7 @@ const meetings: SacramentMeeting[] = [
       { name: 'Sister Brooks', topic: 'Repentance', type: 'speaker' },
       {
         name: 'Youth Ensemble',
-        topic: 'I Feel My Savior’s Love',
+        topic: "I Feel My Savior's Love",
         type: 'musical-number',
       },
       {
@@ -78,7 +102,7 @@ const meetings: SacramentMeeting[] = [
   },
   {
     id: 4,
-    date: '2026-08-02',
+    date: sundayDates[3],
     meetingType: 'stake',
     presiding: 'Stake President Davis',
     conducting: 'Stake President Davis',
@@ -91,11 +115,7 @@ const meetings: SacramentMeeting[] = [
     stakeBusiness: true,
     sacramentHymn: { number: 194, title: 'There Is a Green Hill Far Away' },
     speakers: [
-      {
-        name: 'Sister Kim',
-        topic: 'Covenant Path',
-        type: 'speaker',
-      },
+      { name: 'Sister Kim', topic: 'Covenant Path', type: 'speaker' },
       {
         name: 'President Davis',
         topic: 'Following the Savior',
@@ -107,7 +127,7 @@ const meetings: SacramentMeeting[] = [
   },
   {
     id: 5,
-    date: '2026-08-09',
+    date: sundayDates[4],
     meetingType: 'general',
     presiding: 'Bishop Smith',
     conducting: 'Brother Johnson',
@@ -126,7 +146,7 @@ const meetings: SacramentMeeting[] = [
   },
   {
     id: 6,
-    date: '2026-08-16',
+    date: sundayDates[5],
     meetingType: 'regular',
     presiding: 'Bishop Smith',
     conducting: 'Sister Morales',
@@ -137,26 +157,33 @@ const meetings: SacramentMeeting[] = [
       { description: 'Release: Sister Hall as Relief Society Teacher' },
     ],
     stakeBusiness: false,
-    sacramentHymn: { number: 176, title: "'Tis Sweet to Sing the Matchless Love" },
+    sacramentHymn: {
+      number: 176,
+      title: "'Tis Sweet to Sing the Matchless Love",
+    },
     speakers: [
       { name: 'Brother Grant', topic: 'Scripture Study', type: 'speaker' },
-      {
-        name: 'Sister Grant',
-        topic: 'Family Prayer',
-        type: 'speaker',
-      },
+      { name: 'Sister Grant', topic: 'Family Prayer', type: 'speaker' },
     ],
     closingHymn: { number: 152, title: 'God Be with You Till We Meet Again' },
     closingPrayer: 'Sister Walsh',
   },
 ];
 
-export function getToday(): string {
-  return new Date().toISOString().slice(0, 10);
+function sortByDateAsc(items: SacramentMeeting[]): SacramentMeeting[] {
+  return [...items].sort((a, b) =>
+    compareAsc(parseISO(a.date), parseISO(b.date)),
+  );
+}
+
+function sortByDateDesc(items: SacramentMeeting[]): SacramentMeeting[] {
+  return [...items].sort((a, b) =>
+    compareDesc(parseISO(a.date), parseISO(b.date)),
+  );
 }
 
 export function getAllMeetings(): SacramentMeeting[] {
-  return [...meetings].sort((a, b) => a.date.localeCompare(b.date));
+  return sortByDateAsc(meetings);
 }
 
 export function getMeetingById(id: number): SacramentMeeting | undefined {
@@ -164,43 +191,63 @@ export function getMeetingById(id: number): SacramentMeeting | undefined {
 }
 
 export function getMeetingByDate(date: string): SacramentMeeting | undefined {
-  return meetings.find((meeting) => meeting.date === date);
+  const target = parseISO(date);
+  return meetings.find((meeting) =>
+    isSameDay(parseISO(meeting.date), target),
+  );
 }
 
 export function getTodayMeeting(): SacramentMeeting | undefined {
-  return getMeetingByDate(getToday());
+  if (!isTodaySunday()) return undefined;
+  return getMeetingByDate(toDateString(new Date()));
 }
 
 export function getCurrentMeeting(): SacramentMeeting | undefined {
-  const today = getToday();
-  return meetings
-    .filter((meeting) => meeting.date <= today)
-    .sort((a, b) => b.date.localeCompare(a.date))[0];
+  const currentSunday = getCurrentSundayString();
+  const onCurrentSunday = getMeetingByDate(currentSunday);
+  if (onCurrentSunday) return onCurrentSunday;
+
+  return sortByDateDesc(
+    meetings.filter((meeting) => meeting.date <= currentSunday),
+  )[0];
+}
+
+export function getNextMeeting(): SacramentMeeting | undefined {
+  const currentSunday = getCurrentSundayString();
+  return sortByDateAsc(
+    meetings.filter((meeting) => meeting.date > currentSunday),
+  )[0];
 }
 
 export function getMeetingsByType(type: MeetingType): SacramentMeeting[] {
-  return meetings
-    .filter((meeting) => meeting.meetingType === type)
-    .sort((a, b) => a.date.localeCompare(b.date));
+  return sortByDateAsc(
+    meetings.filter((meeting) => meeting.meetingType === type),
+  );
 }
 
 export function getMeetingsByDateRange(
   startDate: string,
   endDate: string,
 ): SacramentMeeting[] {
-  return meetings
-    .filter((meeting) => meeting.date >= startDate && meeting.date <= endDate)
-    .sort((a, b) => a.date.localeCompare(b.date));
+  return sortByDateAsc(
+    meetings.filter(
+      (meeting) => meeting.date >= startDate && meeting.date <= endDate,
+    ),
+  );
 }
 
-export function getUpcomingMeetings(fromDate = getToday()): SacramentMeeting[] {
-  return meetings
-    .filter((meeting) => meeting.date >= fromDate)
-    .sort((a, b) => a.date.localeCompare(b.date));
+export function getUpcomingMeetings(
+  fromDate = getCurrentSundayString(),
+): SacramentMeeting[] {
+  return sortByDateAsc(
+    meetings.filter((meeting) => meeting.date >= fromDate),
+  );
 }
 
-export function getPastMeetings(beforeDate = getToday()): SacramentMeeting[] {
-  return meetings
-    .filter((meeting) => meeting.date < beforeDate)
-    .sort((a, b) => b.date.localeCompare(a.date));
+export function getPastMeetings(
+  beforeDate = getCurrentSundayString(),
+): SacramentMeeting[] {
+  return sortByDateDesc(
+    meetings.filter((meeting) => meeting.date < beforeDate),
+  );
 }
