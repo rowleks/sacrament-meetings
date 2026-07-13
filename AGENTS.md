@@ -1,10 +1,12 @@
 <!-- BEGIN:nextjs-agent-rules -->
+
 # This is NOT the Next.js you know
 
 This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
 <!-- END:nextjs-agent-rules -->
 
 <!-- BEGIN:project-overview -->
+
 # Sacrament Meeting Planner
 
 A minimal, reverent web application for LDS church leaders and members to organize and manage sacrament meetings.
@@ -50,4 +52,33 @@ A minimal, reverent web application for LDS church leaders and members to organi
 ## Conventions
 
 - Use Tailwind utility classes for colors (`bg-white`, `border-border`, `text-foreground`, `bg-primary/10`, `bg-secondary/20`, etc.) instead of `var(--color-...)` — all design tokens are registered in `@theme inline` and available as Tailwind utilities.
+
+## App Requirements
+
+The app should support creating sacrament meeting entries for each Sunday, with default meeting details and one of the following meeting types:
+
+- **testimony**
+- **regular**
+- **stake** (non-sacrament meeting)
+- **general** (non-sacrament meeting)
+
+### Leader capabilities
+
+Leaders should be able to:
+
+- View and navigate between a list of sacrament meeting entries and their details
+- Manage sacrament meeting details including:
+  - Opening Hymn
+  - Opening Prayer
+  - Ward Business
+  - Stake Business (true/false)
+  - Sacrament Hymn
+  - Speakers
+  - Musical Numbers
+  - Closing Hymn
+  - Closing Prayer
+
+### Program view
+
+Users should be able to view and print the meeting program for the current and past weeks.
 <!-- END:project-overview -->
