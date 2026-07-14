@@ -42,11 +42,13 @@ A minimal, reverent web application for LDS church leaders and members to organi
 
 ## API Routes
 
-- `GET /api/meetings` — list meetings (`?scope=all|upcoming|past`, `?type=…`)
+- `GET /api/meetings` — list meetings (`?scope=all|upcoming|past`, `?type=…`, `?date=…`)
+- `POST /api/meetings` — create meeting (date, type, presiding, conducting)
 - `GET /api/meetings/current` — current Sunday meeting (or most recent on/before)
 - `GET /api/meetings/[id]` — single meeting by id
 
 Pages should load meeting data via `app/lib/api.ts` (fetch), not by importing `meeting-db` directly.
+Creating a meeting uses a client modal (`CreateMeetingButton` / `CreateMeetingModal`), not a `/meetings/new` page.
 
 ## Commands
 

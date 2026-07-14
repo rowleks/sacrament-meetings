@@ -58,7 +58,10 @@ export default async function UpcomingMeetings() {
             }}
           />
         ))}
-        <EmptyMeetingCard date={formatMeetingDate(emptyDate)} />
+        <EmptyMeetingCard
+          date={formatMeetingDate(emptyDate)}
+          defaultDate={emptyDate}
+        />
       </div>
     </section>
   );

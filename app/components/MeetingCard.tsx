@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import CreateMeetingButton from './CreateMeetingButton';
 import {
   CalendarIcon,
   CheckIcon,
@@ -78,24 +79,24 @@ export function MeetingCard({ meeting }: { meeting: Meeting }) {
 
 export function EmptyMeetingCard({
   date,
-  href = '/meetings/new',
+  defaultDate,
 }: {
   date: string;
-  href?: string;
+  defaultDate?: string;
 }) {
   return (
-    <Link
-      href={href}
-      className="flex flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed border-border bg-secondary/10 p-6 text-center transition-colors hover:border-secondary hover:bg-secondary/20"
+    <CreateMeetingButton
+      defaultDate={defaultDate}
+      className="flex w-full flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed border-border bg-secondary/10 p-6 text-center transition-colors hover:border-secondary hover:bg-secondary/20"
     >
       <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-soft">
         <CalendarIcon />
       </span>
-      <h3 className="text-lg">{date}</h3>
+      <h3 className="text-lg text-primary">{date}</h3>
       <p className="text-sm text-foreground/50">No program created yet.</p>
       <span className="text-xs font-semibold uppercase tracking-wide text-primary">
         Start Planning
       </span>
-    </Link>
+    </CreateMeetingButton>
   );
 }

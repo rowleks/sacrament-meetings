@@ -1,14 +1,16 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import MeetingTypeBadge from '../../components/MeetingTypeBadge';
-import { fetchMeetingById } from '../../lib/api';
 import { formatMeetingDate } from '../../lib/dates';
-import { getAllMeetings } from '../../lib/meeting-db';
+import { getAllMeetings, getMeetingById } from '../../lib/meeting-db';
 import type { Hymn } from '../../lib/types';
 
 type PageProps = {
   params: Promise<{ id: string }>;
 };
+
+export const dynamic = 'force-dynamic';
+export const dynamicParams = true;
 
 export function generateStaticParams() {
   return getAllMeetings().map((meeting) => ({
@@ -57,7 +59,7 @@ export default async function MeetingDetailPage({ params }: PageProps) {
 
   if (Number.isNaN(meetingId)) notFound();
 
-  const meeting = await fetchMeetingById(meetingId);
+  const meeting = getMeetingById(meetingId);
   if (!meeting) notFound();
 
   return (

@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import CreateMeetingButton from './CreateMeetingButton';
 
 export default function WelcomeBanner({
   name = 'Bishopric',
@@ -17,13 +17,13 @@ export default function WelcomeBanner({
           requiring attention this month.
         </p>
       </div>
-      <Link
-        href="/meetings/new"
+      <CreateMeetingButton
         className="btn-primary inline-flex shrink-0 items-center justify-center gap-2 px-6 py-3 text-sm tracking-wide uppercase"
+        label="Create New Meeting"
       >
         <span className="text-lg leading-none">+</span>
         Create New Meeting
-      </Link>
+      </CreateMeetingButton>
     </section>
   );
 }

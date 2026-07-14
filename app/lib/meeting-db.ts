@@ -3,6 +3,7 @@ import {
   compareAsc,
   compareDesc,
   isSameDay,
+  isSunday,
   parseISO,
 } from 'date-fns';
 import {
@@ -13,7 +14,11 @@ import {
   isTodaySunday,
   toDateString,
 } from './dates';
-import type { MeetingType, SacramentMeeting } from './types';
+import type {
+  CreateMeetingInput,
+  MeetingType,
+  SacramentMeeting,
+} from './types';
 
 const sundayDates = [
   toDateString(getPreviousSunday()),
@@ -24,7 +29,7 @@ const sundayDates = [
   toDateString(addWeeks(getCurrentSunday(), 4)),
 ] as const;
 
-const meetings: SacramentMeeting[] = [
+const seedMeetings: SacramentMeeting[] = [
   {
     id: 1,
     date: sundayDates[0],
@@ -170,6 +175,27 @@ const meetings: SacramentMeeting[] = [
   },
 ];
 
+const globalForMeetings = globalThis as typeof globalThis & {
+  __sacramentMeetings?: SacramentMeeting[];
+};
+
+function getMeetingsStore(): SacramentMeeting[] {
+  if (!globalForMeetings.__sacramentMeetings) {
+    globalForMeetings.__sacramentMeetings = seedMeetings.map((meeting) => ({
+      ...meeting,
+      announcements: meeting.announcements
+        ? [...meeting.announcements]
+        : undefined,
+      wardBusiness: meeting.wardBusiness.map((item) => ({ ...item })),
+      speakers: meeting.speakers.map((item) => ({ ...item })),
+      openingHymn: { ...meeting.openingHymn },
+      sacramentHymn: { ...meeting.sacramentHymn },
+      closingHymn: { ...meeting.closingHymn },
+    }));
+  }
+  return globalForMeetings.__sacramentMeetings;
+}
+
 function sortByDateAsc(items: SacramentMeeting[]): SacramentMeeting[] {
   return [...items].sort((a, b) =>
     compareAsc(parseISO(a.date), parseISO(b.date)),
@@ -183,16 +209,16 @@ function sortByDateDesc(items: SacramentMeeting[]): SacramentMeeting[] {
 }
 
 export function getAllMeetings(): SacramentMeeting[] {
-  return sortByDateAsc(meetings);
+  return sortByDateAsc(getMeetingsStore());
 }
 
 export function getMeetingById(id: number): SacramentMeeting | undefined {
-  return meetings.find((meeting) => meeting.id === id);
+  return getMeetingsStore().find((meeting) => meeting.id === id);
 }
 
 export function getMeetingByDate(date: string): SacramentMeeting | undefined {
   const target = parseISO(date);
-  return meetings.find((meeting) =>
+  return getMeetingsStore().find((meeting) =>
     isSameDay(parseISO(meeting.date), target),
   );
 }
@@ -208,20 +234,20 @@ export function getCurrentMeeting(): SacramentMeeting | undefined {
   if (onCurrentSunday) return onCurrentSunday;
 
   return sortByDateDesc(
-    meetings.filter((meeting) => meeting.date <= currentSunday),
+    getMeetingsStore().filter((meeting) => meeting.date <= currentSunday),
   )[0];
 }
 
 export function getNextMeeting(): SacramentMeeting | undefined {
   const currentSunday = getCurrentSundayString();
   return sortByDateAsc(
-    meetings.filter((meeting) => meeting.date > currentSunday),
+    getMeetingsStore().filter((meeting) => meeting.date > currentSunday),
   )[0];
 }
 
 export function getMeetingsByType(type: MeetingType): SacramentMeeting[] {
   return sortByDateAsc(
-    meetings.filter((meeting) => meeting.meetingType === type),
+    getMeetingsStore().filter((meeting) => meeting.meetingType === type),
   );
 }
 
@@ -230,7 +256,7 @@ export function getMeetingsByDateRange(
   endDate: string,
 ): SacramentMeeting[] {
   return sortByDateAsc(
-    meetings.filter(
+    getMeetingsStore().filter(
       (meeting) => meeting.date >= startDate && meeting.date <= endDate,
     ),
   );
@@ -240,7 +266,7 @@ export function getUpcomingMeetings(
   fromDate = getCurrentSundayString(),
 ): SacramentMeeting[] {
   return sortByDateAsc(
-    meetings.filter((meeting) => meeting.date >= fromDate),
+    getMeetingsStore().filter((meeting) => meeting.date >= fromDate),
   );
 }
 
@@ -248,6 +274,53 @@ export function getPastMeetings(
   beforeDate = getCurrentSundayString(),
 ): SacramentMeeting[] {
   return sortByDateDesc(
-    meetings.filter((meeting) => meeting.date < beforeDate),
+    getMeetingsStore().filter((meeting) => meeting.date < beforeDate),
   );
+}
+
+const defaultHymn = { number: 0, title: 'TBD' };
+
+export function createMeeting(
+  input: CreateMeetingInput,
+): SacramentMeeting | { error: string; status: 400 | 409 } {
+  const date = input.date?.trim();
+  const meetingType = input.meetingType;
+  const presiding = input.presiding?.trim();
+  const conducting = input.conducting?.trim();
+
+  if (!date || !presiding || !conducting) {
+    return { error: 'Date, presiding, and conducting are required', status: 400 };
+  }
+
+  if (!isSunday(parseISO(date))) {
+    return { error: 'Meeting date must be a Sunday', status: 400 };
+  }
+
+  if (getMeetingByDate(date)) {
+    return { error: 'A meeting already exists for this Sunday', status: 409 };
+  }
+
+  const store = getMeetingsStore();
+  const nextId =
+    store.reduce((max, meeting) => Math.max(max, meeting.id), 0) + 1;
+
+  const meeting: SacramentMeeting = {
+    id: nextId,
+    date,
+    meetingType,
+    presiding,
+    conducting,
+    announcements: input.announcements ?? [],
+    openingHymn: input.openingHymn ?? { ...defaultHymn },
+    openingPrayer: input.openingPrayer ?? '',
+    wardBusiness: input.wardBusiness ?? [],
+    stakeBusiness: input.stakeBusiness ?? meetingType === 'stake',
+    sacramentHymn: input.sacramentHymn ?? { ...defaultHymn },
+    speakers: input.speakers ?? [],
+    closingHymn: input.closingHymn ?? { ...defaultHymn },
+    closingPrayer: input.closingPrayer ?? '',
+  };
+
+  store.push(meeting);
+  return meeting;
 }

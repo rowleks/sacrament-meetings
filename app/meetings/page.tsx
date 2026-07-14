@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import CreateMeetingButton from '../components/CreateMeetingButton';
 import MeetingTypeBadge from '../components/MeetingTypeBadge';
 import { fetchCurrentMeeting, fetchMeetings } from '../lib/api';
 import { formatMeetingDate } from '../lib/dates';
@@ -49,9 +50,7 @@ export default async function MeetingsPage() {
           <Link href="/meetings/current" className="btn-secondary text-sm">
             Current Meeting
           </Link>
-          <Link href="/meetings/new" className="btn-primary text-sm">
-            Create Meeting
-          </Link>
+          <CreateMeetingButton />
         </div>
       </div>
 

@@ -35,3 +35,15 @@ export interface SacramentMeeting {
   closingHymn: Hymn;
   closingPrayer: string;
 }
+
+/** Required fields to create a meeting; remaining agenda fields optional (defaults applied). */
+export type CreateMeetingInput = Pick<
+  SacramentMeeting,
+  'date' | 'meetingType' | 'presiding' | 'conducting'
+> &
+  Partial<
+    Omit<
+      SacramentMeeting,
+      'id' | 'date' | 'meetingType' | 'presiding' | 'conducting'
+    >
+  >;
