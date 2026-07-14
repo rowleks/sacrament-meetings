@@ -48,8 +48,20 @@ A minimal, reverent web application for LDS church leaders and members to organi
 - `GET /api/meetings/current` — current Sunday meeting (or most recent on/before)
 - `GET /api/meetings/[id]` — single meeting by id
 
-Pages should load meeting data via `app/lib/api.ts` (fetch), not by importing `meeting-db` directly.
+Pages load meeting data via `app/lib/api.ts` (server-side HTTP fetch to `/api/meetings*`).
+Browser mutations use `app/lib/client-api.ts` or relative `fetch('/api/...')`.
 Creating a meeting uses a client modal (`CreateMeetingButton` / `CreateMeetingModal`), not a `/meetings/new` page.
+
+### Env (server fetch base URL)
+
+`app/lib/api.ts` needs an absolute origin for SSR self-fetch:
+
+| Variable | Notes |
+|----------|--------|
+| `NEXT_PUBLIC_BASE_URL` | Preferred. Full origin, e.g. `https://your-app.vercel.app` (no trailing slash). |
+| `VERCEL_URL` | Auto-set by Vercel (host only). Code prefixes `https://`. |
+
+Local default if unset: `http://localhost:3000`.
 
 ## Commands
 

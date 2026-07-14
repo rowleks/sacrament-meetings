@@ -1,7 +1,7 @@
-import { headers } from 'next/headers';
-import type { MeetingType, SacramentMeeting } from './types';
+import { headers } from "next/headers";
+import type { MeetingType, SacramentMeeting } from "./types";
 
-export type MeetingsScope = 'all' | 'upcoming' | 'past';
+export type MeetingsScope = "all" | "upcoming" | "past";
 
 export type MeetingsListResponse = {
   meetings: SacramentMeeting[];
@@ -12,36 +12,42 @@ export type MeetingResponse = {
   meeting: SacramentMeeting;
 };
 
+/**
+ * Absolute origin for server-side fetches to this app's API.
+ *
+ * Set one of these on Vercel (recommended for previews):
+ * - NEXT_PUBLIC_BASE_URL=https://your-deployment.vercel.app
+ * - or rely on VERCEL_URL (set automatically by Vercel, no protocol)
+ */
 async function getBaseUrl(): Promise<string> {
   if (process.env.NEXT_PUBLIC_BASE_URL) {
-    return process.env.NEXT_PUBLIC_BASE_URL.replace(/\/$/, '');
+    return process.env.NEXT_PUBLIC_BASE_URL.replace(/\/$/, "");
   }
 
-  if (process.env.VERCEL_URL) {
-    return `https://${process.env.VERCEL_URL}`;
+  if (process.env.NEXT_PUBLIC_VERCEL_URL) {
+    return `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`;
   }
 
   try {
     const headerStore = await headers();
-    const host = headerStore.get('x-forwarded-host') ?? headerStore.get('host');
+    const host = headerStore.get("x-forwarded-host") ?? headerStore.get("host");
     const protocol =
-      headerStore.get('x-forwarded-proto') ??
-      (process.env.NODE_ENV === 'development' ? 'http' : 'https');
+      headerStore.get("x-forwarded-proto") ?? (process.env.NODE_ENV === "development" ? "http" : "https");
 
     if (host) {
       return `${protocol}://${host}`;
     }
   } catch {
-    // headers() unavailable outside a request (e.g. some build steps)
+    // headers() unavailable outside a request
   }
 
-  return 'http://localhost:3000';
+  return "http://localhost:3000";
 }
 
 async function apiFetch<T>(path: string): Promise<T> {
   const baseUrl = await getBaseUrl();
   const res = await fetch(`${baseUrl}${path}`, {
-    cache: 'no-store',
+    cache: "no-store",
   });
 
   if (!res.ok) {
@@ -57,26 +63,22 @@ export async function fetchMeetings(options?: {
 }): Promise<MeetingsListResponse> {
   const params = new URLSearchParams();
 
-  if (options?.scope && options.scope !== 'all') {
-    params.set('scope', options.scope);
+  if (options?.scope && options.scope !== "all") {
+    params.set("scope", options.scope);
   }
 
   if (options?.type) {
-    params.set('type', options.type);
+    params.set("type", options.type);
   }
 
   const query = params.toString();
-  return apiFetch<MeetingsListResponse>(
-    `/api/meetings${query ? `?${query}` : ''}`,
-  );
+  return apiFetch<MeetingsListResponse>(`/api/meetings${query ? `?${query}` : ""}`);
 }
 
-export async function fetchMeetingById(
-  id: number | string,
-): Promise<SacramentMeeting | null> {
+export async function fetchMeetingById(id: number | string): Promise<SacramentMeeting | null> {
   const baseUrl = await getBaseUrl();
   const res = await fetch(`${baseUrl}/api/meetings/${id}`, {
-    cache: 'no-store',
+    cache: "no-store",
   });
 
   if (res.status === 404) return null;
@@ -91,7 +93,7 @@ export async function fetchMeetingById(
 export async function fetchCurrentMeeting(): Promise<SacramentMeeting | null> {
   const baseUrl = await getBaseUrl();
   const res = await fetch(`${baseUrl}/api/meetings/current`, {
-    cache: 'no-store',
+    cache: "no-store",
   });
 
   if (res.status === 404) return null;
