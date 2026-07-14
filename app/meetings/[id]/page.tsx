@@ -1,8 +1,9 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import MeetingTypeBadge from '../../components/MeetingTypeBadge';
+import { fetchMeetingById } from '../../lib/api';
 import { formatMeetingDate } from '../../lib/dates';
-import { getAllMeetings, getMeetingById } from '../../lib/meeting-db';
+import { getAllMeetings } from '../../lib/meeting-db';
 import type { Hymn } from '../../lib/types';
 
 type PageProps = {
@@ -56,7 +57,7 @@ export default async function MeetingDetailPage({ params }: PageProps) {
 
   if (Number.isNaN(meetingId)) notFound();
 
-  const meeting = getMeetingById(meetingId);
+  const meeting = await fetchMeetingById(meetingId);
   if (!meeting) notFound();
 
   return (

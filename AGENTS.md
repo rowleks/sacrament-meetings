@@ -34,6 +34,19 @@ A minimal, reverent web application for LDS church leaders and members to organi
 - `app/globals.css` — all design tokens, base styles, component classes, utilities
 - `app/layout.tsx` — root layout with font setup and metadata
 - `app/page.tsx` — home page
+- `app/lib/types.ts` — domain types
+- `app/lib/dates.ts` — Sunday-aware date helpers (date-fns)
+- `app/lib/meeting-db.ts` — in-memory meetings data + query helpers
+- `app/lib/api.ts` — server-side fetch helpers for meeting APIs
+- `app/api/meetings/` — REST route handlers
+
+## API Routes
+
+- `GET /api/meetings` — list meetings (`?scope=all|upcoming|past`, `?type=…`)
+- `GET /api/meetings/current` — current Sunday meeting (or most recent on/before)
+- `GET /api/meetings/[id]` — single meeting by id
+
+Pages should load meeting data via `app/lib/api.ts` (fetch), not by importing `meeting-db` directly.
 
 ## Commands
 
@@ -52,6 +65,8 @@ A minimal, reverent web application for LDS church leaders and members to organi
 ## Conventions
 
 - Use Tailwind utility classes for colors (`bg-white`, `border-border`, `text-foreground`, `bg-primary/10`, `bg-secondary/20`, etc.) instead of `var(--color-...)` — all design tokens are registered in `@theme inline` and available as Tailwind utilities.
+- Meetings are Sunday-based. Use `date-fns` via `app/lib/dates.ts` for calendar math.
+- Fetch meetings through `/api/meetings*` using helpers in `app/lib/api.ts`.
 
 ## App Requirements
 

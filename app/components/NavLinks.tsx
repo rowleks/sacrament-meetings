@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const links = [
-  { href: '/', label: 'Dashboard' },
-  { href: '/meetings', label: 'Meetings' },
-  { href: '/members', label: 'Members' },
-  { href: '/settings', label: 'Settings' },
+  { href: "/", label: "Dashboard" },
+  { href: "/meetings", label: "Meetings" },
+  // { href: '/members', label: 'Members' },
+  // { href: '/settings', label: 'Settings' },
 ];
 
 export default function NavLinks() {
@@ -22,9 +22,7 @@ export default function NavLinks() {
             key={link.href}
             href={link.href}
             className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
-              isActive
-                ? 'bg-primary/10 text-primary'
-                : 'text-foreground hover:bg-secondary/20'
+              isActive ? "bg-primary/10 text-primary" : "text-foreground hover:bg-secondary/20"
             }`}
           >
             {link.label}

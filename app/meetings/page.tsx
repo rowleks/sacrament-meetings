@@ -1,12 +1,7 @@
 import Link from 'next/link';
 import MeetingTypeBadge from '../components/MeetingTypeBadge';
-import { formatMeetingDate, getCurrentSundayString } from '../lib/dates';
-import {
-  getAllMeetings,
-  getCurrentMeeting,
-  getPastMeetings,
-  getUpcomingMeetings,
-} from '../lib/meeting-db';
+import { fetchCurrentMeeting, fetchMeetings } from '../lib/api';
+import { formatMeetingDate } from '../lib/dates';
 import type { SacramentMeeting } from '../lib/types';
 
 function MeetingRow({ meeting }: { meeting: SacramentMeeting }) {
@@ -29,12 +24,17 @@ function MeetingRow({ meeting }: { meeting: SacramentMeeting }) {
   );
 }
 
-export default function MeetingsPage() {
-  const current = getCurrentMeeting();
-  const upcoming = getUpcomingMeetings().filter((m) => m.id !== current?.id);
-  const past = getPastMeetings();
-  const all = getAllMeetings();
-  const currentSunday = getCurrentSundayString();
+export default async function MeetingsPage() {
+  const [{ meetings: upcoming }, { meetings: past }, current, { currentSunday }] =
+    await Promise.all([
+      fetchMeetings({ scope: 'upcoming' }),
+      fetchMeetings({ scope: 'past' }),
+      fetchCurrentMeeting(),
+      fetchMeetings(),
+    ]);
+
+  const upcomingWithoutCurrent = upcoming.filter((m) => m.id !== current?.id);
+  const hasAny = upcoming.length > 0 || past.length > 0;
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8 space-y-10">
@@ -67,11 +67,11 @@ export default function MeetingsPage() {
         </section>
       )}
 
-      {upcoming.length > 0 && (
+      {upcomingWithoutCurrent.length > 0 && (
         <section className="space-y-3">
           <h2>Upcoming</h2>
           <div className="space-y-3">
-            {upcoming.map((meeting) => (
+            {upcomingWithoutCurrent.map((meeting) => (
               <MeetingRow key={meeting.id} meeting={meeting} />
             ))}
           </div>
@@ -89,7 +89,7 @@ export default function MeetingsPage() {
         </section>
       )}
 
-      {all.length === 0 && (
+      {!hasAny && (
         <div className="card text-center text-foreground/60">
           No meetings yet. Create one to get started.
         </div>

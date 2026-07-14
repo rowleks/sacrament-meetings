@@ -1,8 +1,8 @@
 import { redirect } from 'next/navigation';
-import { getCurrentMeeting } from '../../lib/meeting-db';
+import { fetchCurrentMeeting } from '../../lib/api';
 
-export default function CurrentMeetingPage() {
-  const meeting = getCurrentMeeting();
+export default async function CurrentMeetingPage() {
+  const meeting = await fetchCurrentMeeting();
 
   if (!meeting) {
     redirect('/meetings');
