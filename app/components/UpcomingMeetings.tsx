@@ -39,7 +39,7 @@ export default async function UpcomingMeetings() {
         <h2>Upcoming Meetings</h2>
         <Link
           href="/meetings"
-          className="text-xs font-medium uppercase tracking-wide text-primary/70 hover:text-primary"
+          className="text-xs font-medium uppercase tracking-wide text-primary hover:text-primary"
         >
           View Calendar →
         </Link>

@@ -16,7 +16,7 @@ function MeetingRow({ meeting }: { meeting: SacramentMeeting }) {
           <h3 className="text-lg">{formatMeetingDate(meeting.date)}</h3>
           <MeetingTypeBadge type={meeting.meetingType} />
         </div>
-        <p className="text-sm text-foreground/60">
+        <p className="text-sm text-muted">
           Presiding: {meeting.presiding} · Conducting: {meeting.conducting}
         </p>
       </div>
@@ -42,7 +42,7 @@ export default async function MeetingsPage() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h1 className="mb-1">Meetings</h1>
-          <p className="text-foreground/70">
+          <p className="text-muted">
             All sacrament meeting programs, organized by Sunday.
           </p>
         </div>
@@ -58,7 +58,7 @@ export default async function MeetingsPage() {
         <section className="space-y-3">
           <div className="flex items-center justify-between">
             <h2>Current Sunday</h2>
-            <span className="text-xs uppercase tracking-wide text-foreground/50">
+            <span className="text-xs uppercase tracking-wide text-muted">
               {formatMeetingDate(currentSunday)}
             </span>
           </div>
@@ -89,7 +89,7 @@ export default async function MeetingsPage() {
       )}
 
       {!hasAny && (
-        <div className="card text-center text-foreground/60">
+        <div className="card text-center text-muted">
           No meetings yet. Create one to get started.
         </div>
       )}

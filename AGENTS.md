@@ -23,8 +23,9 @@ A minimal, reverent web application for LDS church leaders and members to organi
 - **Secondary**: `#A7B6C2` — soft steel blue for highlights and accents
 - **Background**: `#F9FAFB` — light neutral background
 - **Text**: `#2E2E2E` — dark gray for readability
+- **Muted**: `#4A5568` — secondary body text / icons (WCAG AA on light backgrounds)
 - **Accent**: `#CBB67C` — warm gold for subtle emphasis
-- **Border**: `#E5E7EB` — light gray borders
+- **Border**: `#9AA3AF` — gray borders with ≥3:1 contrast on white
 - **Radii**: `6px` / `10px` / `16px` / `24px` (sm/md/lg/xl)
 - **Shadows**: soft, card, elevated — all subtle and muted
 - **Spacing**: `4/8/16/24/32/48px` scale
@@ -66,7 +67,8 @@ Creating a meeting uses a client modal (`CreateMeetingButton` / `CreateMeetingMo
 
 ## Conventions
 
-- Use Tailwind utility classes for colors (`bg-white`, `border-border`, `text-foreground`, `bg-primary/10`, `bg-secondary/20`, etc.) instead of `var(--color-...)` — all design tokens are registered in `@theme inline` and available as Tailwind utilities.
+- Use Tailwind utility classes for colors (`bg-white`, `border-border`, `text-foreground`, `text-muted`, `bg-primary/10`, `bg-secondary/20`, etc.) instead of `var(--color-...)` — all design tokens are registered in `@theme inline` and available as Tailwind utilities.
+- Prefer `text-muted` over `text-foreground/40–70` or `text-secondary` for secondary copy — low-opacity text often fails WCAG AA.
 - Meetings are Sunday-based. Use `date-fns` via `app/lib/dates.ts` for calendar math.
 - Fetch meetings through `/api/meetings*` using helpers in `app/lib/api.ts`.
 

@@ -284,7 +284,7 @@ export default function CreateMeetingForm({
                 />
                 <button
                   type="button"
-                  className="shrink-0 rounded-md px-2 text-foreground/40 hover:bg-secondary/20 hover:text-foreground"
+                  className="shrink-0 rounded-md px-2 text-muted hover:bg-secondary/20 hover:text-foreground"
                   aria-label="Remove announcement"
                   onClick={() =>
                     setAnnouncements((rows) =>
@@ -360,7 +360,7 @@ export default function CreateMeetingForm({
                 />
                 <button
                   type="button"
-                  className="shrink-0 rounded-md px-2 text-foreground/40 hover:bg-secondary/20 hover:text-foreground"
+                  className="shrink-0 rounded-md px-2 text-muted hover:bg-secondary/20 hover:text-foreground"
                   aria-label="Remove ward business"
                   onClick={() =>
                     setWardBusiness((rows) =>
@@ -399,7 +399,7 @@ export default function CreateMeetingForm({
             </button>
           </div>
           {meetingType === 'testimony' && (
-            <p className="text-sm text-foreground/60">
+            <p className="text-sm text-muted">
               Testimony meeting — speakers are optional; the program can be open
               to the congregation.
             </p>
@@ -411,12 +411,12 @@ export default function CreateMeetingForm({
                 className="space-y-2 rounded-md border border-border p-3"
               >
                 <div className="flex items-center justify-between gap-2">
-                  <span className="text-xs font-medium uppercase tracking-wide text-foreground/50">
+                  <span className="text-xs font-medium uppercase tracking-wide text-muted">
                     Item {index + 1}
                   </span>
                   <button
                     type="button"
-                    className="rounded-md px-2 text-sm text-foreground/40 hover:bg-secondary/20 hover:text-foreground"
+                    className="rounded-md px-2 text-sm text-muted hover:bg-secondary/20 hover:text-foreground"
                     aria-label="Remove speaker"
                     onClick={() =>
                       setSpeakers((rows) =>

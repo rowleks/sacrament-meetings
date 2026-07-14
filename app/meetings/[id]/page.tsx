@@ -21,7 +21,7 @@ export function generateStaticParams() {
 function HymnLine({ label, hymn }: { label: string; hymn: Hymn }) {
   return (
     <div className="flex flex-col gap-0.5 sm:flex-row sm:items-baseline sm:justify-between">
-      <span className="text-sm font-medium text-foreground/50">{label}</span>
+      <span className="text-sm font-medium text-muted">{label}</span>
       <span className="text-foreground">
         #{hymn.number} — {hymn.title}
       </span>
@@ -47,7 +47,7 @@ function AgendaSection({
 function PersonLine({ label, name }: { label: string; name: string }) {
   return (
     <div className="flex flex-col gap-0.5 sm:flex-row sm:items-baseline sm:justify-between">
-      <span className="text-sm font-medium text-foreground/50">{label}</span>
+      <span className="text-sm font-medium text-muted">{label}</span>
       <span className="text-foreground">{name}</span>
     </div>
   );
@@ -68,7 +68,7 @@ export default async function MeetingDetailPage({ params }: PageProps) {
         <div className="space-y-2">
           <Link
             href="/meetings"
-            className="text-sm text-foreground/60 hover:text-primary"
+            className="text-sm text-muted hover:text-primary"
           >
             ← All meetings
           </Link>
@@ -78,7 +78,7 @@ export default async function MeetingDetailPage({ params }: PageProps) {
             </h1>
             <MeetingTypeBadge type={meeting.meetingType} />
           </div>
-          <p className="text-sm text-foreground/60">
+          <p className="text-sm text-muted">
             Sacrament Meeting Program
           </p>
         </div>
@@ -106,7 +106,7 @@ export default async function MeetingDetailPage({ params }: PageProps) {
 
         {meeting.announcements && meeting.announcements.length > 0 && (
           <AgendaSection title="Announcements">
-            <ul className="list-disc space-y-1 pl-5 text-foreground/80">
+            <ul className="list-disc space-y-1 pl-5 text-foreground">
               {meeting.announcements.map((item) => (
                 <li key={item}>{item}</li>
               ))}
@@ -127,14 +127,14 @@ export default async function MeetingDetailPage({ params }: PageProps) {
               </p>
             )}
             {meeting.wardBusiness.length > 0 ? (
-              <ul className="list-disc space-y-1 pl-5 text-foreground/80">
+              <ul className="list-disc space-y-1 pl-5 text-foreground">
                 {meeting.wardBusiness.map((item) => (
                   <li key={item.description}>{item.description}</li>
                 ))}
               </ul>
             ) : (
               !meeting.stakeBusiness && (
-                <p className="text-sm text-foreground/50">None</p>
+                <p className="text-sm text-muted">None</p>
               )
             )}
           </AgendaSection>
@@ -146,11 +146,11 @@ export default async function MeetingDetailPage({ params }: PageProps) {
 
         <AgendaSection title="Program">
           {meeting.meetingType === 'testimony' ? (
-            <p className="text-foreground/80">
+            <p className="text-foreground">
               Bearing of testimonies by the congregation.
             </p>
           ) : meeting.speakers.length === 0 ? (
-            <p className="text-sm text-foreground/50">No speakers listed.</p>
+            <p className="text-sm text-muted">No speakers listed.</p>
           ) : (
             <ol className="space-y-3">
               {meeting.speakers.map((item, index) => (
@@ -160,13 +160,13 @@ export default async function MeetingDetailPage({ params }: PageProps) {
                 >
                   <div>
                     <p className="font-medium text-foreground">{item.name}</p>
-                    <p className="text-sm text-foreground/50">
+                    <p className="text-sm text-muted">
                       {item.type === 'musical-number'
                         ? 'Musical Number'
                         : 'Speaker'}
                     </p>
                   </div>
-                  <p className="text-sm text-foreground/70">{item.topic}</p>
+                  <p className="text-sm text-muted">{item.topic}</p>
                 </li>
               ))}
             </ol>

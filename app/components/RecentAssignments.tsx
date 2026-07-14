@@ -53,14 +53,14 @@ export default function RecentAssignments() {
               </span>
               <div className="min-w-0 flex-1">
                 <p className="font-medium text-foreground">{assignment.name}</p>
-                <p className="text-sm text-foreground/50">
+                <p className="text-sm text-muted">
                   {assignment.role} · {assignment.date}
                 </p>
               </div>
               <StatusBadge status={assignment.status} />
               <button
                 type="button"
-                className="rounded-md p-1 text-foreground/40 hover:bg-secondary/20 hover:text-foreground"
+                className="rounded-md p-1 text-muted hover:bg-secondary/20 hover:text-foreground"
                 aria-label="More options"
               >
                 <MoreIcon />

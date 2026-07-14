@@ -11,7 +11,7 @@ const styles: Record<MeetingType, string> = {
   testimony: 'bg-accent/30 text-primary',
   regular: 'bg-primary/10 text-primary',
   stake: 'bg-secondary/40 text-primary',
-  general: 'bg-secondary/30 text-foreground/80',
+  general: 'bg-secondary/30 text-foreground',
 };
 
 export default function MeetingTypeBadge({ type }: { type: MeetingType }) {

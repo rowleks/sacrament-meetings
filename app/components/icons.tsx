@@ -2,7 +2,7 @@ type IconProps = {
   className?: string;
 };
 
-export function PersonIcon({ className = 'h-4 w-4 shrink-0 text-secondary' }: IconProps) {
+export function PersonIcon({ className = 'h-4 w-4 shrink-0 text-muted' }: IconProps) {
   return (
     <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
       <path
@@ -14,7 +14,7 @@ export function PersonIcon({ className = 'h-4 w-4 shrink-0 text-secondary' }: Ic
   );
 }
 
-export function PodiumIcon({ className = 'h-4 w-4 shrink-0 text-secondary' }: IconProps) {
+export function PodiumIcon({ className = 'h-4 w-4 shrink-0 text-muted' }: IconProps) {
   return (
     <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
       <path
@@ -90,7 +90,7 @@ export function SearchIcon({ className = 'h-4 w-4' }: IconProps) {
   );
 }
 
-export function UsersIcon({ className = 'h-5 w-5 text-secondary' }: IconProps) {
+export function UsersIcon({ className = 'h-5 w-5 text-muted' }: IconProps) {
   return (
     <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
       <path
@@ -102,7 +102,7 @@ export function UsersIcon({ className = 'h-5 w-5 text-secondary' }: IconProps) {
   );
 }
 
-export function HistoryIcon({ className = 'h-5 w-5 text-secondary' }: IconProps) {
+export function HistoryIcon({ className = 'h-5 w-5 text-muted' }: IconProps) {
   return (
     <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
       <path

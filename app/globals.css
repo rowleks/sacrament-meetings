@@ -5,9 +5,12 @@
   --color-secondary: #A7B6C2;
   --color-background: #F9FAFB;
   --color-text: #2E2E2E;
+  /* AA muted body text (~7:1 on white / background) */
+  --color-muted: #4A5568;
   --color-accent: #CBB67C;
   --color-white: #FFFFFF;
-  --color-border: #E5E7EB;
+  /* Stronger border for non-text UI (~3:1 on white) */
+  --color-border: #9AA3AF;
 
   --radius-sm: 6px;
   --radius-md: 10px;
@@ -29,6 +32,7 @@
 @theme inline {
   --color-background: var(--color-background);
   --color-foreground: var(--color-text);
+  --color-muted: var(--color-muted);
   --color-primary: var(--color-primary);
   --color-secondary: var(--color-secondary);
   --color-accent: var(--color-accent);
@@ -57,8 +61,13 @@ body {
 }
 
 ::selection {
-  background-color: var(--color-secondary);
+  background-color: var(--color-primary);
   color: var(--color-white);
+}
+
+::placeholder {
+  color: var(--color-muted);
+  opacity: 1;
 }
 
 @layer base {
@@ -89,11 +98,11 @@ body {
 
   a {
     color: var(--color-primary);
-    transition: opacity 0.2s ease;
+    transition: color 0.15s ease, background-color 0.15s ease;
   }
 
   a:hover {
-    opacity: 0.8;
+    color: color-mix(in srgb, var(--color-primary) 85%, white);
   }
 
   button,
@@ -108,6 +117,11 @@ body {
     cursor: pointer;
     font-weight: 500;
     transition: all 0.15s ease;
+  }
+
+  button:disabled {
+    cursor: not-allowed;
+    opacity: 0.65;
   }
 
   input,

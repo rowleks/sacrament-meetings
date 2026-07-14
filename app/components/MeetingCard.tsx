@@ -26,7 +26,7 @@ export function StatusBadge({ status }: { status: StatusBadgeStatus }) {
   const styles: Record<StatusBadgeStatus, string> = {
     Draft: 'bg-accent/30 text-primary',
     Planned: 'bg-secondary/40 text-primary',
-    Pending: 'bg-secondary/30 text-foreground/70',
+    Pending: 'bg-secondary/40 text-primary',
     Confirmed: 'bg-secondary/40 text-primary',
   };
 
@@ -49,17 +49,17 @@ export function MeetingCard({ meeting }: { meeting: Meeting }) {
       className="card flex flex-col gap-4 transition-shadow hover:shadow-elevated"
     >
       <div className="flex items-center justify-between">
-        <span className="text-xs font-medium uppercase tracking-wide text-foreground/50">
+        <span className="text-xs font-medium uppercase tracking-wide text-muted">
           {meeting.label}
         </span>
         <StatusBadge status={meeting.status} />
       </div>
       <h3 className="text-xl">{meeting.date}</h3>
-      <div className="space-y-2 text-sm text-foreground/70">
+      <div className="space-y-2 text-sm text-muted">
         <div className="flex items-start gap-2">
           <PersonIcon />
           <div>
-            <span className="text-foreground/50">Presiding:</span>
+            <span className="text-muted">Presiding:</span>
             <br />
             {meeting.presiding}
           </div>
@@ -67,7 +67,7 @@ export function MeetingCard({ meeting }: { meeting: Meeting }) {
         <div className="flex items-start gap-2">
           <PodiumIcon />
           <div>
-            <span className="text-foreground/50">Conducting:</span>
+            <span className="text-muted">Conducting:</span>
             <br />
             {meeting.conducting}
           </div>
@@ -93,7 +93,7 @@ export function EmptyMeetingCard({
         <CalendarIcon />
       </span>
       <h3 className="text-lg text-primary">{date}</h3>
-      <p className="text-sm text-foreground/50">No program created yet.</p>
+      <p className="text-sm text-muted">No program created yet.</p>
       <span className="text-xs font-semibold uppercase tracking-wide text-primary">
         Start Planning
       </span>

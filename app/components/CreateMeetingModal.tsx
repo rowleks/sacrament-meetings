@@ -54,7 +54,7 @@ export default function CreateMeetingModal({
             <h2 id={titleId} className="text-xl">
               Create Meeting
             </h2>
-            <p className="mt-1 text-sm text-foreground/60">
+            <p className="mt-1 text-sm text-muted">
               Fields marked <span className="text-primary">*</span> are
               required. Leave other rows blank if not needed yet.
             </p>
@@ -62,7 +62,7 @@ export default function CreateMeetingModal({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-md px-2 py-1 text-foreground/50 hover:bg-secondary/20 hover:text-foreground"
+            className="rounded-md px-2 py-1 text-muted hover:bg-secondary/20 hover:text-foreground"
             aria-label="Close"
           >
             ✕
