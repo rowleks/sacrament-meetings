@@ -48,21 +48,12 @@ A minimal, reverent web application for LDS church leaders and members to organi
 - `GET /api/meetings/current` — current Sunday meeting (or most recent on/before)
 - `GET /api/meetings/[id]` — single meeting by id
 
-Pages load meeting data via `app/lib/api.ts` (server-side HTTP fetch to `/api/meetings*`).
+Pages load meeting data via `app/lib/api.ts` (calls `meeting-db` on the server — no HTTP self-fetch).
 Browser mutations use `app/lib/client-api.ts` or relative `fetch('/api/...')`.
+`/api/meetings*` remains for client HTTP access.
 Creating a meeting uses a client modal (`CreateMeetingButton` / `CreateMeetingModal`), not a `/meetings/new` page.
 
-### Env (server fetch base URL)
-
-`app/lib/api.ts` SSR self-fetches `/api/*` with an absolute origin from env (no request headers).
-
-| Variable | Notes |
-|----------|--------|
-| `NEXT_PUBLIC_BASE_URL` | Optional full origin (no trailing slash) |
-| `VERCEL_URL` / `NEXT_PUBLIC_VERCEL_URL` | Auto host; code adds `https://` |
-| `VERCEL_AUTOMATION_BYPASS_SECRET` | If **Deployment Protection** is on, server self-fetch gets HTML login pages unless this bypass is set |
-
-Local default if unset: `http://localhost:3000`.
+> SSR self-fetch of `/api/*` on Vercel often returns HTML (Deployment Protection / wrong host) → `Unexpected token '<'`. Server helpers avoid that.
 
 ## Commands
 
