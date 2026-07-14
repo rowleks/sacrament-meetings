@@ -54,12 +54,13 @@ Creating a meeting uses a client modal (`CreateMeetingButton` / `CreateMeetingMo
 
 ### Env (server fetch base URL)
 
-`app/lib/api.ts` needs an absolute origin for SSR self-fetch:
+`app/lib/api.ts` SSR self-fetches `/api/*` with an absolute origin from env (no request headers).
 
 | Variable | Notes |
 |----------|--------|
-| `NEXT_PUBLIC_BASE_URL` | Preferred. Full origin, e.g. `https://your-app.vercel.app` (no trailing slash). |
-| `VERCEL_URL` | Auto-set by Vercel (host only). Code prefixes `https://`. |
+| `NEXT_PUBLIC_BASE_URL` | Optional full origin (no trailing slash) |
+| `VERCEL_URL` / `NEXT_PUBLIC_VERCEL_URL` | Auto host; code adds `https://` |
+| `VERCEL_AUTOMATION_BYPASS_SECRET` | If **Deployment Protection** is on, server self-fetch gets HTML login pages unless this bypass is set |
 
 Local default if unset: `http://localhost:3000`.
 

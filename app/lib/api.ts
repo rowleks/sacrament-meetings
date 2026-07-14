@@ -1,7 +1,6 @@
-import { headers } from "next/headers";
-import type { MeetingType, SacramentMeeting } from "./types";
+import type { MeetingType, SacramentMeeting } from './types';
 
-export type MeetingsScope = "all" | "upcoming" | "past";
+export type MeetingsScope = 'all' | 'upcoming' | 'past';
 
 export type MeetingsListResponse = {
   meetings: SacramentMeeting[];
@@ -12,49 +11,78 @@ export type MeetingResponse = {
   meeting: SacramentMeeting;
 };
 
+function normalizeOrigin(value: string): string {
+  const trimmed = value.trim().replace(/\/$/, '');
+  if (/^https?:\/\//i.test(trimmed)) {
+    return trimmed;
+  }
+  return `https://${trimmed}`;
+}
+
 /**
  * Absolute origin for server-side fetches to this app's API.
  *
- * Set one of these on Vercel (recommended for previews):
- * - NEXT_PUBLIC_BASE_URL=https://your-deployment.vercel.app
- * - or rely on VERCEL_URL (set automatically by Vercel, no protocol)
+ * 1. NEXT_PUBLIC_BASE_URL
+ * 2. VERCEL_URL / NEXT_PUBLIC_VERCEL_URL
+ * 3. http://localhost:3000
  */
-async function getBaseUrl(): Promise<string> {
+function getBaseUrl(): string {
   if (process.env.NEXT_PUBLIC_BASE_URL) {
-    return process.env.NEXT_PUBLIC_BASE_URL.replace(/\/$/, "");
+    return normalizeOrigin(process.env.NEXT_PUBLIC_BASE_URL);
   }
 
-  if (process.env.NEXT_PUBLIC_VERCEL_URL) {
-    return `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`;
+  const vercelHost =
+    process.env.VERCEL_URL ?? process.env.NEXT_PUBLIC_VERCEL_URL;
+  if (vercelHost) {
+    return normalizeOrigin(vercelHost);
   }
 
-  try {
-    const headerStore = await headers();
-    const host = headerStore.get("x-forwarded-host") ?? headerStore.get("host");
-    const protocol =
-      headerStore.get("x-forwarded-proto") ?? (process.env.NODE_ENV === "development" ? "http" : "https");
-
-    if (host) {
-      return `${protocol}://${host}`;
-    }
-  } catch {
-    // headers() unavailable outside a request
-  }
-
-  return "http://localhost:3000";
+  return 'http://localhost:3000';
 }
 
-async function apiFetch<T>(path: string): Promise<T> {
-  const baseUrl = await getBaseUrl();
-  const res = await fetch(`${baseUrl}${path}`, {
-    cache: "no-store",
-  });
+function apiHeaders(): HeadersInit {
+  const headersInit: Record<string, string> = {
+    Accept: 'application/json',
+  };
 
-  if (!res.ok) {
-    throw new Error(`API ${path} failed with ${res.status}`);
+  const bypass = process.env.VERCEL_AUTOMATION_BYPASS_SECRET;
+  if (bypass) {
+    headersInit['x-vercel-protection-bypass'] = bypass;
   }
 
-  return res.json() as Promise<T>;
+  return headersInit;
+}
+
+async function apiFetch(
+  path: string,
+): Promise<{ res: Response; bodyText: string; url: string }> {
+  const baseUrl = getBaseUrl();
+  const url = `${baseUrl}${path}`;
+  const res = await fetch(url, {
+    cache: 'no-store',
+    headers: apiHeaders(),
+  });
+  const bodyText = await res.text();
+  return { res, bodyText, url };
+}
+
+function parseJsonBody<T>(
+  path: string,
+  url: string,
+  res: Response,
+  bodyText: string,
+): T {
+  const contentType = res.headers.get('content-type') ?? '';
+
+  if (!contentType.includes('application/json')) {
+    const preview = bodyText.slice(0, 80).replace(/\s+/g, ' ');
+    throw new Error(
+      `API ${path} returned non-JSON from ${url} (status ${res.status}). ` +
+        `Check base URL env or Vercel Deployment Protection. Body: ${preview}`,
+    );
+  }
+
+  return JSON.parse(bodyText) as T;
 }
 
 export async function fetchMeetings(options?: {
@@ -63,44 +91,69 @@ export async function fetchMeetings(options?: {
 }): Promise<MeetingsListResponse> {
   const params = new URLSearchParams();
 
-  if (options?.scope && options.scope !== "all") {
-    params.set("scope", options.scope);
+  if (options?.scope && options.scope !== 'all') {
+    params.set('scope', options.scope);
   }
 
   if (options?.type) {
-    params.set("type", options.type);
+    params.set('type', options.type);
   }
 
   const query = params.toString();
-  return apiFetch<MeetingsListResponse>(`/api/meetings${query ? `?${query}` : ""}`);
-}
+  const path = `/api/meetings${query ? `?${query}` : ''}`;
+  const { res, bodyText, url } = await apiFetch(path);
+  const data = parseJsonBody<MeetingsListResponse & { error?: string }>(
+    path,
+    url,
+    res,
+    bodyText,
+  );
 
-export async function fetchMeetingById(id: number | string): Promise<SacramentMeeting | null> {
-  const baseUrl = await getBaseUrl();
-  const res = await fetch(`${baseUrl}/api/meetings/${id}`, {
-    cache: "no-store",
-  });
-
-  if (res.status === 404) return null;
   if (!res.ok) {
-    throw new Error(`API /api/meetings/${id} failed with ${res.status}`);
+    throw new Error(data.error ?? `API ${path} failed with ${res.status}`);
   }
 
-  const data = (await res.json()) as MeetingResponse;
+  return data;
+}
+
+export async function fetchMeetingById(
+  id: number | string,
+): Promise<SacramentMeeting | null> {
+  const path = `/api/meetings/${id}`;
+  const { res, bodyText, url } = await apiFetch(path);
+
+  if (res.status === 404) return null;
+
+  const data = parseJsonBody<MeetingResponse & { error?: string }>(
+    path,
+    url,
+    res,
+    bodyText,
+  );
+
+  if (!res.ok) {
+    throw new Error(data.error ?? `API ${path} failed with ${res.status}`);
+  }
+
   return data.meeting;
 }
 
 export async function fetchCurrentMeeting(): Promise<SacramentMeeting | null> {
-  const baseUrl = await getBaseUrl();
-  const res = await fetch(`${baseUrl}/api/meetings/current`, {
-    cache: "no-store",
-  });
+  const path = '/api/meetings/current';
+  const { res, bodyText, url } = await apiFetch(path);
 
   if (res.status === 404) return null;
+
+  const data = parseJsonBody<MeetingResponse & { error?: string }>(
+    path,
+    url,
+    res,
+    bodyText,
+  );
+
   if (!res.ok) {
-    throw new Error(`API /api/meetings/current failed with ${res.status}`);
+    throw new Error(data.error ?? `API ${path} failed with ${res.status}`);
   }
 
-  const data = (await res.json()) as MeetingResponse;
   return data.meeting;
 }
