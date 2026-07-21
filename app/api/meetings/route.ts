@@ -18,15 +18,20 @@ export async function GET(request: NextRequest) {
   const type = searchParams.get("type");
   const date = searchParams.get("date");
 
-  let meetings = scope === "upcoming" ? getUpcomingMeetings() : scope === "past" ? getPastMeetings() : getAllMeetings();
+  let meetings =
+    scope === "upcoming"
+      ? await getUpcomingMeetings()
+      : scope === "past"
+        ? await getPastMeetings()
+        : await getAllMeetings();
 
   if (date) {
-    const meetingByDate = getMeetingByDate(date);
+    const meetingByDate = await getMeetingByDate(date);
     meetings = meetingByDate ? [meetingByDate] : [];
   }
 
   if (type && meetingTypes.includes(type as MeetingType)) {
-    const filtered = getMeetingsByType(type as MeetingType);
+    const filtered = await getMeetingsByType(type as MeetingType);
     const ids = new Set(filtered.map((m) => m.id));
     meetings = meetings.filter((m) => ids.has(m.id));
   }
@@ -47,19 +52,13 @@ export async function POST(request: NextRequest) {
   }
 
   if (!body?.meetingType || !meetingTypes.includes(body.meetingType)) {
-    return NextResponse.json(
-      { error: "Invalid or missing meeting type" },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: "Invalid or missing meeting type" }, { status: 400 });
   }
 
-  const result = createMeeting(body);
+  const result = await createMeeting(body);
 
   if ("error" in result) {
-    return NextResponse.json(
-      { error: result.error },
-      { status: result.status },
-    );
+    return NextResponse.json({ error: result.error }, { status: result.status });
   }
 
   return NextResponse.json({ meeting: result }, { status: 201 });

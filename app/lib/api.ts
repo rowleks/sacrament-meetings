@@ -1,4 +1,4 @@
-import { getCurrentSundayString } from './dates';
+import { getCurrentSundayString } from "./dates";
 import {
   getAllMeetings,
   getCurrentMeeting,
@@ -6,10 +6,10 @@ import {
   getMeetingsByType,
   getPastMeetings,
   getUpcomingMeetings,
-} from './meeting-db';
-import type { MeetingType, SacramentMeeting } from './types';
+} from "./meeting-db";
+import type { MeetingType, SacramentMeeting } from "./types";
 
-export type MeetingsScope = 'all' | 'upcoming' | 'past';
+export type MeetingsScope = "all" | "upcoming" | "past";
 
 export type MeetingsListResponse = {
   meetings: SacramentMeeting[];
@@ -29,14 +29,14 @@ export async function fetchMeetings(options?: {
   type?: MeetingType;
 }): Promise<MeetingsListResponse> {
   let meetings =
-    options?.scope === 'upcoming'
-      ? getUpcomingMeetings()
-      : options?.scope === 'past'
-        ? getPastMeetings()
-        : getAllMeetings();
+    options?.scope === "upcoming"
+      ? await getUpcomingMeetings()
+      : options?.scope === "past"
+        ? await getPastMeetings()
+        : await getAllMeetings();
 
   if (options?.type) {
-    const ids = new Set(getMeetingsByType(options.type).map((m) => m.id));
+    const ids = new Set((await getMeetingsByType(options.type)).map((m) => m.id));
     meetings = meetings.filter((m) => ids.has(m.id));
   }
 
@@ -46,14 +46,12 @@ export async function fetchMeetings(options?: {
   };
 }
 
-export async function fetchMeetingById(
-  id: number | string,
-): Promise<SacramentMeeting | null> {
+export async function fetchMeetingById(id: number | string): Promise<SacramentMeeting | null> {
   const meetingId = Number(id);
   if (Number.isNaN(meetingId)) return null;
-  return getMeetingById(meetingId) ?? null;
+  return (await getMeetingById(meetingId)) ?? null;
 }
 
 export async function fetchCurrentMeeting(): Promise<SacramentMeeting | null> {
-  return getCurrentMeeting() ?? null;
+  return (await getCurrentMeeting()) ?? null;
 }
