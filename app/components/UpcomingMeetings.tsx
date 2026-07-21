@@ -1,35 +1,19 @@
-import Link from 'next/link';
-import {
-  addWeeks,
-  isSameDay,
-  parseISO,
-} from 'date-fns';
-import { fetchMeetings } from '../lib/api';
-import {
-  formatMeetingDate,
-  getCurrentSunday,
-  getNextSunday,
-  toDateString,
-} from '../lib/dates';
-import type { SacramentMeeting } from '../lib/types';
-import { EmptyMeetingCard, MeetingCard, type MeetingStatus } from './MeetingCard';
+import Link from "next/link";
+import { addWeeks, isSameDay, parseISO } from "date-fns";
+import { fetchMeetings } from "../lib/api";
+import { formatMeetingDate, getCurrentSunday, getNextSunday, toDateString } from "../lib/dates";
+import type { SacramentMeeting } from "../lib/types";
+import { EmptyMeetingCard, MeetingCard } from "./MeetingCard";
 
 function meetingLabel(date: string): string {
   const value = parseISO(date);
-  if (isSameDay(value, getCurrentSunday())) return 'This Sunday';
-  if (isSameDay(value, getNextSunday())) return 'Next Week';
-  return formatMeetingDate(date, 'MMM d');
-}
-
-function meetingStatus(meeting: SacramentMeeting): MeetingStatus {
-  if (meeting.speakers.length === 0 && meeting.meetingType === 'regular') {
-    return 'Draft';
-  }
-  return 'Planned';
+  if (isSameDay(value, getCurrentSunday())) return "This Sunday";
+  if (isSameDay(value, getNextSunday())) return "Next Week";
+  return formatMeetingDate(date, "MMM d");
 }
 
 export default async function UpcomingMeetings() {
-  const { meetings } = await fetchMeetings({ scope: 'upcoming' });
+  const { meetings } = await fetchMeetings({ scope: "upcoming" });
   const preview = meetings.slice(0, 2);
   const emptyDate = toDateString(addWeeks(getCurrentSunday(), preview.length));
 
@@ -37,10 +21,7 @@ export default async function UpcomingMeetings() {
     <section>
       <div className="mb-4 flex items-center justify-between">
         <h2>Upcoming Meetings</h2>
-        <Link
-          href="/meetings"
-          className="text-xs font-medium uppercase tracking-wide text-primary hover:text-primary"
-        >
+        <Link href="/meetings" className="text-xs font-medium uppercase tracking-wide text-primary hover:text-primary">
           View Calendar →
         </Link>
       </div>
@@ -52,16 +33,13 @@ export default async function UpcomingMeetings() {
               id: meeting.id,
               label: meetingLabel(meeting.date),
               date: formatMeetingDate(meeting.date),
-              status: meetingStatus(meeting),
+              meetingType: meeting.meetingType,
               presiding: meeting.presiding,
               conducting: meeting.conducting,
             }}
           />
         ))}
-        <EmptyMeetingCard
-          date={formatMeetingDate(emptyDate)}
-          defaultDate={emptyDate}
-        />
+        <EmptyMeetingCard date={formatMeetingDate(emptyDate)} defaultDate={emptyDate} />
       </div>
     </section>
   );

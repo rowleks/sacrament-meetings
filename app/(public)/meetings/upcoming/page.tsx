@@ -1,9 +1,8 @@
 import Link from "next/link";
-import CreateMeetingButton from "@/components/CreateMeetingButton";
-import MeetingTypeBadge from "@/components/MeetingTypeBadge";
 import { fetchMeetings } from "@/lib/api";
 import { formatMeetingDate, getCurrentSunday, getNextSunday } from "@/lib/dates";
 import type { SacramentMeeting } from "@/lib/types";
+import MeetingTypeBadge from "@/components/MeetingTypeBadge";
 import { PersonIcon, PodiumIcon } from "@/components/icons";
 
 function meetingLabel(date: string): string {
@@ -49,22 +48,14 @@ function MeetingCardWrapper({ meeting }: { meeting: SacramentMeeting }) {
   );
 }
 
-export default async function MeetingsPage() {
-  const { meetings } = await fetchMeetings({ scope: "all" });
+export default async function UpcomingMeetingsPage() {
+  const { meetings } = await fetchMeetings({ scope: "upcoming" });
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8 space-y-10">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <h1 className="mb-1">All Meetings</h1>
-          <p className="text-muted">Every sacrament meeting program.</p>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <Link href="/meetings/current" className="btn-secondary text-sm">
-            Current Meeting
-          </Link>
-          <CreateMeetingButton />
-        </div>
+      <div>
+        <h1 className="mb-1">Upcoming Meetings</h1>
+        <p className="text-muted">Future sacrament meeting programs.</p>
       </div>
 
       {meetings.length > 0 ? (
@@ -76,7 +67,7 @@ export default async function MeetingsPage() {
           </div>
         </section>
       ) : (
-        <div className="card text-center text-muted py-12">No meetings found.</div>
+        <div className="card text-center text-muted py-12">No upcoming meetings scheduled.</div>
       )}
     </div>
   );

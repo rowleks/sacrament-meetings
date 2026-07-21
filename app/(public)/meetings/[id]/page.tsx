@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import MeetingTypeBadge from "@/components/MeetingTypeBadge";
 import { formatMeetingDate } from "@/lib/dates";
-import { getAllMeetings, getMeetingById } from "@/lib/meeting-db";
+import { getMeetingById } from "@/lib/meeting-db";
 import type { Hymn } from "@/lib/types";
 
 type PageProps = {
@@ -12,12 +12,12 @@ type PageProps = {
 export const dynamic = "force-dynamic";
 export const dynamicParams = true;
 
-export async function generateStaticParams() {
-  const meetings = await getAllMeetings();
-  return meetings.map((meeting) => ({
-    id: String(meeting.id),
-  }));
-}
+// export async function generateStaticParams() {
+//   const meetings = await getAllMeetings();
+//   return meetings.map((meeting) => ({
+//     id: String(meeting.id),
+//   }));
+// }
 
 function HymnLine({ label, hymn }: { label: string; hymn: Hymn }) {
   return (
