@@ -160,3 +160,74 @@ export async function createMeeting(
 
   return toMeeting(rows[0] as MeetingRow);
 }
+
+/* ------------------------------------------------------------------ */
+/*  Update                                                             */
+/* ------------------------------------------------------------------ */
+
+export async function updateMeeting(
+  id: number,
+  input: Partial<SacramentMeeting>,
+): Promise<SacramentMeeting | { error: string; status: 400 | 404 | 409 }> {
+  const existing = await getMeetingById(id);
+  if (!existing) {
+    return { error: "Meeting not found", status: 404 };
+  }
+
+  const date = input.date?.trim() ?? existing.date;
+  const meetingType = input.meetingType ?? existing.meetingType;
+  const presiding = input.presiding?.trim() ?? existing.presiding;
+  const conducting = input.conducting?.trim() ?? existing.conducting;
+
+  if (!date || !presiding || !conducting) {
+    return { error: "Date, presiding, and conducting are required", status: 400 };
+  }
+
+  if (!isSunday(parseISO(date))) {
+    return { error: "Meeting date must be a Sunday", status: 400 };
+  }
+
+  // Check if date changed and if there's already a meeting on that date
+  if (date !== existing.date) {
+    const existingOnDate = await getMeetingByDate(date);
+    if (existingOnDate && existingOnDate.id !== id) {
+      return { error: "A meeting already exists for this Sunday", status: 409 };
+    }
+  }
+
+  const openingHymn = input.openingHymn ?? existing.openingHymn;
+  const sacramentHymn = input.sacramentHymn ?? existing.sacramentHymn;
+  const closingHymn = input.closingHymn ?? existing.closingHymn;
+  const announcements = input.announcements ?? existing.announcements;
+  const wardBusiness = input.wardBusiness ?? existing.wardBusiness;
+  const speakers = input.speakers ?? existing.speakers;
+  const stakeBusiness = input.stakeBusiness ?? existing.stakeBusiness;
+  const openingPrayer = input.openingPrayer ?? existing.openingPrayer;
+  const closingPrayer = input.closingPrayer ?? existing.closingPrayer;
+
+  const rows = await sql`
+      UPDATE meetings
+      SET
+        date = ${date},
+        meeting_type = ${meetingType},
+        presiding = ${presiding},
+        conducting = ${conducting},
+        announcements = ${announcements},
+        opening_hymn = ${openingHymn},
+        opening_prayer = ${openingPrayer},
+        ward_business = ${wardBusiness},
+        stake_business = ${stakeBusiness},
+        sacrament_hymn = ${sacramentHymn},
+        speakers = ${speakers},
+        closing_hymn = ${closingHymn},
+        closing_prayer = ${closingPrayer}
+      WHERE id = ${id}
+      RETURNING *
+    `;
+
+  if (!rows[0]) {
+    return { error: "Meeting not found", status: 404 };
+  }
+
+  return toMeeting(rows[0] as MeetingRow);
+}

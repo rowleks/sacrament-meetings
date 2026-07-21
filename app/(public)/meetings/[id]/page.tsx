@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import MeetingTypeBadge from "../../components/MeetingTypeBadge";
-import { formatMeetingDate } from "../../lib/dates";
-import { getAllMeetings, getMeetingById } from "../../lib/meeting-db";
-import type { Hymn } from "../../lib/types";
+import MeetingTypeBadge from "@/components/MeetingTypeBadge";
+import { formatMeetingDate } from "@/lib/dates";
+import { getAllMeetings, getMeetingById } from "@/lib/meeting-db";
+import type { Hymn } from "@/lib/types";
 
 type PageProps = {
   params: Promise<{ id: string }>;
