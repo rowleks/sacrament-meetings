@@ -1,5 +1,6 @@
 import Link from "next/link";
 import MeetingTypeBadge from "@/components/MeetingTypeBadge";
+import PrintButton from "./PrintButton";
 import { formatMeetingDate } from "@/lib/dates";
 import type { Hymn, SacramentMeeting } from "@/lib/types";
 
@@ -7,7 +8,9 @@ function HymnLine({ label, hymn }: { label: string; hymn: Hymn }) {
   return (
     <div className="flex flex-col gap-0.5 sm:flex-row sm:items-baseline sm:justify-between">
       <span className="text-sm font-medium text-muted">{label}</span>
-      <span className="text-foreground">#{hymn.number} — {hymn.title}</span>
+      <span className="text-foreground">
+        #{hymn.number} — {hymn.title}
+      </span>
     </div>
   );
 }
@@ -40,7 +43,7 @@ export default function MeetingProgram({ meeting, showEditLinks = true }: Meetin
     <div className="mx-auto max-w-3xl px-4 py-8 space-y-8">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="space-y-2">
-          <Link href="/meetings" className="text-sm text-muted hover:text-primary">
+          <Link href="/meetings" className="text-sm text-muted hover:text-primary no-print">
             ← All meetings
           </Link>
           <div className="flex flex-wrap items-center gap-2">
@@ -54,9 +57,7 @@ export default function MeetingProgram({ meeting, showEditLinks = true }: Meetin
             <Link href={`/meetings/${meeting.id}/edit`} className="btn-secondary text-sm">
               Edit
             </Link>
-            <Link href={`/meetings/${meeting.id}/print`} className="btn-primary text-sm">
-              Print Program
-            </Link>
+            <PrintButton />
           </div>
         )}
       </div>

@@ -16,7 +16,7 @@ export default function MeetingsNav() {
   const inactive = "border border-border text-muted hover:bg-secondary/20";
 
   return (
-    <nav className="flex flex-wrap gap-2 text-sm" aria-label="Meeting sections">
+    <nav className="flex flex-wrap gap-2 text-sm meetings-nav" aria-label="Meeting sections">
       <Link href="/meetings/current" className={`${base} ${isCurrent ? active : inactive}`}>
         Current
       </Link>

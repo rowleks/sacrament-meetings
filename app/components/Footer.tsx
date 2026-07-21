@@ -1,13 +1,9 @@
 export default function Footer() {
   return (
-    <footer className="w-full border-t border-border bg-white mt-auto">
+    <footer className="w-full border-t border-border bg-white mt-auto no-print">
       <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4">
-        <p className="text-xs text-muted">
-          Sacrament Meeting Planner
-        </p>
-        <p className="text-xs text-muted">
-          &copy; {new Date().getFullYear()}
-        </p>
+        <p className="text-xs text-muted">Sacrament Meeting Planner</p>
+        <p className="text-xs text-muted">&copy; {new Date().getFullYear()}</p>
       </div>
     </footer>
   );
