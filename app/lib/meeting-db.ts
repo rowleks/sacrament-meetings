@@ -159,6 +159,7 @@ export async function searchMeetings(options: SearchOptions = {}): Promise<Pagin
     conditions.push(`(
       presiding ILIKE $${p}
       OR conducting ILIKE $${p}
+      OR meeting_type ILIKE $${p}
       OR EXISTS (
         SELECT 1 FROM jsonb_array_elements(speakers) AS s
         WHERE s->>'name' ILIKE $${p} OR s->>'topic' ILIKE $${p}
