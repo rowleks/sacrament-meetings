@@ -1,6 +1,8 @@
 import Link from "next/link";
 import CreateMeetingButton from "@/components/CreateMeetingButton";
 import MeetingTypeBadge from "@/components/MeetingTypeBadge";
+import Pagination from "@/components/Pagination";
+import SearchInput from "@/components/SearchInput";
 import { fetchMeetings } from "@/lib/api";
 import { formatMeetingDate, getCurrentSunday, getNextSunday } from "@/lib/dates";
 import type { SacramentMeeting } from "@/lib/types";
@@ -49,11 +51,23 @@ function MeetingCardWrapper({ meeting }: { meeting: SacramentMeeting }) {
   );
 }
 
-export default async function MeetingsPage() {
-  const { meetings } = await fetchMeetings({ scope: "all" });
+export default async function MeetingsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ query?: string; page?: string }>;
+}) {
+  const { query, page } = await searchParams;
+  const currentPage = page ? Math.max(1, Number(page)) : 1;
+
+  const { meetings, total, totalPages } = await fetchMeetings({
+    scope: "all",
+    query: query || undefined,
+    page: currentPage,
+    limit: 6,
+  });
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-8 space-y-10">
+    <>
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h1 className="mb-1">All Meetings</h1>
@@ -67,17 +81,32 @@ export default async function MeetingsPage() {
         </div>
       </div>
 
+      <div className="max-w-xs">
+        <SearchInput />
+      </div>
+
       {meetings.length > 0 ? (
-        <section className="space-y-3">
+        <section className="space-y-6">
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {meetings.map((meeting) => (
               <MeetingCardWrapper key={meeting.id} meeting={meeting} />
             ))}
           </div>
+          {totalPages !== undefined && (
+            <Pagination page={currentPage} totalPages={totalPages} />
+          )}
         </section>
       ) : (
-        <div className="card text-center text-muted py-12">No meetings found.</div>
+        <div className="card text-center text-muted py-12">
+          {query ? "No meetings match your search." : "No meetings found."}
+        </div>
       )}
-    </div>
+
+      {total !== undefined && total > 0 && (
+        <p className="text-center text-xs text-muted">
+          Showing {Math.min((currentPage - 1) * 6 + 1, total)}&ndash;{Math.min(currentPage * 6, total)} of {total}
+        </p>
+      )}
+    </>
   );
 }

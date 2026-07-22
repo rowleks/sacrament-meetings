@@ -7,6 +7,7 @@ import {
   getMeetingsByType,
   getPastMeetings,
   getUpcomingMeetings,
+  searchMeetings,
 } from "../../lib/meeting-db";
 import type { CreateMeetingInput, MeetingType } from "../../lib/types";
 
@@ -17,6 +18,26 @@ export async function GET(request: NextRequest) {
   const scope = searchParams.get("scope") ?? "all";
   const type = searchParams.get("type");
   const date = searchParams.get("date");
+  const query = searchParams.get("query");
+  const pageParam = searchParams.get("page");
+  const limitParam = searchParams.get("limit");
+
+  const usePagination = query || pageParam || limitParam;
+
+  if (usePagination) {
+    const result = await searchMeetings({
+      query: query ?? undefined,
+      scope: scope as "all" | "upcoming" | "past",
+      type: type && meetingTypes.includes(type as MeetingType) ? (type as MeetingType) : undefined,
+      page: pageParam ? Math.max(1, Number(pageParam)) : 1,
+      limit: limitParam ? Math.max(1, Math.min(50, Number(limitParam))) : 6,
+    });
+
+    return NextResponse.json({
+      ...result,
+      currentSunday: getCurrentSundayString(),
+    });
+  }
 
   let meetings =
     scope === "upcoming"

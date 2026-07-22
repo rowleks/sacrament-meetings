@@ -3,6 +3,26 @@ import { isSunday, parseISO } from "date-fns";
 import { getCurrentSundayString, isTodaySunday, toDateString } from "./dates";
 import type { CreateMeetingInput, MeetingType, SacramentMeeting } from "./types";
 
+/* ------------------------------------------------------------------ */
+/*  Search / pagination types                                          */
+/* ------------------------------------------------------------------ */
+
+export interface SearchOptions {
+  query?: string;
+  scope?: "all" | "upcoming" | "past";
+  type?: MeetingType;
+  page?: number;
+  limit?: number;
+}
+
+export interface PaginatedResult {
+  meetings: SacramentMeeting[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
 const sql = neon(process.env.DATABASE_URL!);
 
 /* ------------------------------------------------------------------ */
@@ -106,6 +126,68 @@ export async function getUpcomingMeetings(fromDate = getCurrentSundayString()): 
 export async function getPastMeetings(beforeDate = getCurrentSundayString()): Promise<SacramentMeeting[]> {
   const rows = await sql`SELECT * FROM meetings WHERE date < ${beforeDate} ORDER BY date DESC`;
   return rows.map(toMeeting);
+}
+
+/* ------------------------------------------------------------------ */
+/*  Search + pagination                                                */
+/* ------------------------------------------------------------------ */
+
+export async function searchMeetings(options: SearchOptions = {}): Promise<PaginatedResult> {
+  const { query, scope = "all", type, page = 1, limit = 6 } = options;
+  const offset = (page - 1) * limit;
+  const currentSunday = getCurrentSundayString();
+
+  const conditions: string[] = [];
+  const params: unknown[] = [];
+  let p = 1;
+
+  if (scope === "upcoming") {
+    conditions.push(`date >= $${p++}`);
+    params.push(currentSunday);
+  } else if (scope === "past") {
+    conditions.push(`date < $${p++}`);
+    params.push(currentSunday);
+  }
+
+  if (type) {
+    conditions.push(`meeting_type = $${p++}`);
+    params.push(type);
+  }
+
+  if (query) {
+    const q = `%${query}%`;
+    conditions.push(`(
+      presiding ILIKE $${p}
+      OR conducting ILIKE $${p}
+      OR EXISTS (
+        SELECT 1 FROM jsonb_array_elements(speakers) AS s
+        WHERE s->>'name' ILIKE $${p} OR s->>'topic' ILIKE $${p}
+      )
+    )`);
+    params.push(q);
+    p++;
+  }
+
+  const where = conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+  const orderBy = scope === "past" ? "date DESC" : "date ASC";
+
+  const [countRows, dataRows] = await Promise.all([
+    sql.query(`SELECT COUNT(*) FROM meetings ${where}`, params),
+    sql.query(
+      `SELECT * FROM meetings ${where} ORDER BY ${orderBy} LIMIT ${limit} OFFSET ${offset}`,
+      params,
+    ),
+  ]);
+
+  const total = parseInt(countRows[0].count as string, 10);
+
+  return {
+    meetings: (dataRows as MeetingRow[]).map(toMeeting),
+    total,
+    page,
+    limit,
+    totalPages: Math.ceil(total / limit),
+  };
 }
 
 /* ------------------------------------------------------------------ */
