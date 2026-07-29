@@ -2,6 +2,7 @@
 
 import { useState, useActionState, useTransition } from "react";
 import { createMeetingAction } from "../lib/actions";
+import { FieldError } from "./FieldError";
 import { getNextSundayString } from "../lib/dates";
 import type { CreateMeetingInput, Hymn, MeetingType, SpeakerItem, WardBusinessItem } from "../lib/types";
 
@@ -161,8 +162,10 @@ export default function CreateMeetingForm({ defaultDate, onCancel }: CreateMeeti
                 required
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
+                aria-invalid={!!state?.errors?.date}
                 className="mt-1 w-full"
               />
+              <FieldError error={state?.errors?.date} />
             </div>
             <div>
               <label htmlFor="meeting-type">
@@ -177,6 +180,7 @@ export default function CreateMeetingForm({ defaultDate, onCancel }: CreateMeeti
                   setMeetingType(mt);
                   if (mt === "stake") setStakeBusiness(true);
                 }}
+                aria-invalid={!!state?.errors?.meetingType}
                 className="mt-1 w-full"
               >
                 {meetingTypes.map((type) => (
@@ -185,6 +189,7 @@ export default function CreateMeetingForm({ defaultDate, onCancel }: CreateMeeti
                   </option>
                 ))}
               </select>
+              <FieldError error={state?.errors?.meetingType} />
             </div>
             <div>
               <label htmlFor="meeting-presiding">
@@ -197,8 +202,10 @@ export default function CreateMeetingForm({ defaultDate, onCancel }: CreateMeeti
                 value={presiding}
                 onChange={(e) => setPresiding(e.target.value)}
                 placeholder="Bishop Smith"
+                aria-invalid={!!state?.errors?.presiding}
                 className="mt-1 w-full"
               />
+              <FieldError error={state?.errors?.presiding} />
             </div>
             <div>
               <label htmlFor="meeting-conducting">
@@ -211,8 +218,10 @@ export default function CreateMeetingForm({ defaultDate, onCancel }: CreateMeeti
                 value={conducting}
                 onChange={(e) => setConducting(e.target.value)}
                 placeholder="Brother Johnson"
+                aria-invalid={!!state?.errors?.conducting}
                 className="mt-1 w-full"
               />
+              <FieldError error={state?.errors?.conducting} />
             </div>
           </div>
         </section>

@@ -2,6 +2,7 @@
 
 import { useState, useActionState, useTransition } from "react";
 import { updateMeetingAction } from "@/lib/actions";
+import { FieldError } from "./FieldError";
 import type { Hymn, MeetingType, SacramentMeeting, SpeakerItem, WardBusinessItem } from "@/lib/types";
 
 const meetingTypes: { value: MeetingType; label: string }[] = [
@@ -197,8 +198,10 @@ export default function EditMeetingForm({ meeting, onCancel = () => {}, onSucces
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
                 required
+                aria-invalid={!!state?.errors?.date}
                 className="mt-1 w-full"
               />
+              <FieldError error={state?.errors?.date} />
             </div>
             <div>
               <label htmlFor="meeting-type" className="block text-sm font-medium">
@@ -213,6 +216,7 @@ export default function EditMeetingForm({ meeting, onCancel = () => {}, onSucces
                   if (mt === "stake") setStakeBusiness(true);
                 }}
                 required
+                aria-invalid={!!state?.errors?.meetingType}
                 className="mt-1 w-full"
               >
                 {meetingTypes.map((t) => (
@@ -221,6 +225,7 @@ export default function EditMeetingForm({ meeting, onCancel = () => {}, onSucces
                   </option>
                 ))}
               </select>
+              <FieldError error={state?.errors?.meetingType} />
             </div>
             <div className="sm:col-span-2">
               <label htmlFor="presiding" className="block text-sm font-medium">
@@ -232,9 +237,11 @@ export default function EditMeetingForm({ meeting, onCancel = () => {}, onSucces
                 value={presiding}
                 onChange={(e) => setPresiding(e.target.value)}
                 required
+                aria-invalid={!!state?.errors?.presiding}
                 className="mt-1 w-full"
                 placeholder="Bishop or Stake President"
               />
+              <FieldError error={state?.errors?.presiding} />
             </div>
             <div className="sm:col-span-2">
               <label htmlFor="conducting" className="block text-sm font-medium">
@@ -246,9 +253,11 @@ export default function EditMeetingForm({ meeting, onCancel = () => {}, onSucces
                 value={conducting}
                 onChange={(e) => setConducting(e.target.value)}
                 required
+                aria-invalid={!!state?.errors?.conducting}
                 className="mt-1 w-full"
                 placeholder="Bishopric member"
               />
+              <FieldError error={state?.errors?.conducting} />
             </div>
           </div>
         </section>
