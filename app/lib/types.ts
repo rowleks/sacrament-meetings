@@ -1,8 +1,4 @@
-export type MeetingType =
-  | 'testimony'
-  | 'regular'
-  | 'stake'
-  | 'general';
+export type MeetingType = "testimony" | "regular" | "stake" | "general";
 
 export interface Hymn {
   number: number;
@@ -12,7 +8,7 @@ export interface Hymn {
 export interface SpeakerItem {
   name: string;
   topic: string;
-  type: 'speaker' | 'musical-number';
+  type: "speaker" | "musical-number";
 }
 
 export interface WardBusinessItem {
@@ -37,13 +33,8 @@ export interface SacramentMeeting {
 }
 
 /** Required fields to create a meeting; remaining agenda fields optional (defaults applied). */
-export type CreateMeetingInput = Pick<
-  SacramentMeeting,
-  'date' | 'meetingType' | 'presiding' | 'conducting'
-> &
-  Partial<
-    Omit<
-      SacramentMeeting,
-      'id' | 'date' | 'meetingType' | 'presiding' | 'conducting'
-    >
-  >;
+export type CreateMeetingInput = Pick<SacramentMeeting, "date" | "meetingType" | "presiding" | "conducting"> &
+  Partial<Omit<SacramentMeeting, "id" | "date" | "meetingType" | "presiding" | "conducting">>;
+
+/** Partial fields to update a meeting; all fields optional. */
+export type UpdateMeetingInput = Partial<Omit<SacramentMeeting, "id">>;

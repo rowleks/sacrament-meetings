@@ -1,58 +1,23 @@
-import Link from 'next/link';
-import CreateMeetingButton from './CreateMeetingButton';
-import {
-  CalendarIcon,
-  CheckIcon,
-  ClockIcon,
-  PencilIcon,
-  PersonIcon,
-  PodiumIcon,
-} from './icons';
-
-export type MeetingStatus = 'Draft' | 'Planned';
+import Link from "next/link";
+import CreateMeetingButton from "./CreateMeetingButton";
+import { CalendarIcon, PersonIcon, PodiumIcon } from "./icons";
+import MeetingTypeBadge from "./MeetingTypeBadge";
 
 export type Meeting = {
   id: number;
   label: string;
   date: string;
-  status: MeetingStatus;
+  meetingType: "testimony" | "regular" | "stake" | "general";
   presiding: string;
   conducting: string;
 };
 
-export type StatusBadgeStatus = MeetingStatus | 'Pending' | 'Confirmed';
-
-export function StatusBadge({ status }: { status: StatusBadgeStatus }) {
-  const styles: Record<StatusBadgeStatus, string> = {
-    Draft: 'bg-accent/30 text-primary',
-    Planned: 'bg-secondary/40 text-primary',
-    Pending: 'bg-secondary/40 text-primary',
-    Confirmed: 'bg-secondary/40 text-primary',
-  };
-
-  return (
-    <span
-      className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium uppercase tracking-wide ${styles[status]}`}
-    >
-      {status === 'Draft' && <PencilIcon />}
-      {(status === 'Planned' || status === 'Pending') && <ClockIcon />}
-      {status === 'Confirmed' && <CheckIcon />}
-      {status}
-    </span>
-  );
-}
-
 export function MeetingCard({ meeting }: { meeting: Meeting }) {
   return (
-    <Link
-      href={`/meetings/${meeting.id}`}
-      className="card flex flex-col gap-4 transition-shadow hover:shadow-elevated"
-    >
+    <Link href={`/meetings/${meeting.id}`} className="card flex flex-col gap-4 transition-shadow hover:shadow-elevated">
       <div className="flex items-center justify-between">
-        <span className="text-xs font-medium uppercase tracking-wide text-muted">
-          {meeting.label}
-        </span>
-        <StatusBadge status={meeting.status} />
+        <span className="text-xs font-medium uppercase tracking-wide text-muted">{meeting.label}</span>
+        <MeetingTypeBadge type={meeting.meetingType} />
       </div>
       <h3 className="text-xl">{meeting.date}</h3>
       <div className="space-y-2 text-sm text-muted">
@@ -77,13 +42,7 @@ export function MeetingCard({ meeting }: { meeting: Meeting }) {
   );
 }
 
-export function EmptyMeetingCard({
-  date,
-  defaultDate,
-}: {
-  date: string;
-  defaultDate?: string;
-}) {
+export function EmptyMeetingCard({ date, defaultDate }: { date: string; defaultDate?: string }) {
   return (
     <CreateMeetingButton
       defaultDate={defaultDate}
@@ -94,9 +53,36 @@ export function EmptyMeetingCard({
       </span>
       <h3 className="text-lg text-primary">{date}</h3>
       <p className="text-sm text-muted">No program created yet.</p>
-      <span className="text-xs font-semibold uppercase tracking-wide text-primary">
-        Start Planning
-      </span>
+      <span className="text-xs font-semibold uppercase tracking-wide text-primary">Start Planning</span>
     </CreateMeetingButton>
+  );
+}
+
+export function MeetingCardSkeleton() {
+  return (
+    <div className="card animate-pulse p-4 space-y-3">
+      <div className="flex items-center justify-between">
+        <div className="h-4 w-24 bg-secondary/20 rounded" />
+        <div className="h-5 w-16 bg-secondary/20 rounded-full" />
+      </div>
+      <div className="h-6 w-3/4 bg-secondary/20 rounded" />
+      <div className="h-5 w-20 bg-secondary/20 rounded" />
+      <div className="space-y-2">
+        <div className="flex items-start gap-2">
+          <div className="h-4 w-4 bg-secondary/20 rounded shrink-0" />
+          <div className="space-y-1">
+            <div className="h-3 w-16 bg-secondary/20 rounded" />
+            <div className="h-3 w-24 bg-secondary/20 rounded" />
+          </div>
+        </div>
+        <div className="flex items-start gap-2">
+          <div className="h-4 w-4 bg-secondary/20 rounded shrink-0" />
+          <div className="space-y-1">
+            <div className="h-3 w-16 bg-secondary/20 rounded" />
+            <div className="h-3 w-24 bg-secondary/20 rounded" />
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
