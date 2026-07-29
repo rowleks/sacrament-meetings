@@ -1,30 +1,23 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { createMeetingRequest } from '../lib/client-api';
-import { getNextSundayString } from '../lib/dates';
-import type {
-  CreateMeetingInput,
-  Hymn,
-  MeetingType,
-  SpeakerItem,
-  WardBusinessItem,
-} from '../lib/types';
+import { useState, useActionState, useTransition } from "react";
+import { createMeetingAction } from "../lib/actions";
+import { getNextSundayString } from "../lib/dates";
+import type { CreateMeetingInput, Hymn, MeetingType, SpeakerItem, WardBusinessItem } from "../lib/types";
 
 const meetingTypes: { value: MeetingType; label: string }[] = [
-  { value: 'regular', label: 'Regular' },
-  { value: 'testimony', label: 'Testimony' },
-  { value: 'stake', label: 'Stake' },
-  { value: 'general', label: 'General' },
+  { value: "regular", label: "Regular" },
+  { value: "testimony", label: "Testimony" },
+  { value: "stake", label: "Stake" },
+  { value: "general", label: "General" },
 ];
 
-const emptyHymn = (): Hymn => ({ number: 0, title: '' });
+const emptyHymn = (): Hymn => ({ number: 0, title: "" });
 
 const emptySpeaker = (): SpeakerItem => ({
-  name: '',
-  topic: '',
-  type: 'speaker',
+  name: "",
+  topic: "",
+  type: "speaker",
 });
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
@@ -59,11 +52,11 @@ function HymnFields({
             type="number"
             min={0}
             placeholder="#"
-            value={value.number || ''}
+            value={value.number || ""}
             onChange={(e) =>
               onChange({
                 ...value,
-                number: e.target.value === '' ? 0 : Number(e.target.value),
+                number: e.target.value === "" ? 0 : Number(e.target.value),
               })
             }
             className="mt-0 w-full"
@@ -93,57 +86,26 @@ export type CreateMeetingFormProps = {
   onSuccess?: () => void;
 };
 
-export default function CreateMeetingForm({
-  defaultDate,
-  onCancel,
-  onSuccess,
-}: CreateMeetingFormProps) {
-  const router = useRouter();
+export default function CreateMeetingForm({ defaultDate, onCancel }: CreateMeetingFormProps) {
+  const [state, formAction, isPending] = useActionState(createMeetingAction, null);
+  const [, startTransition] = useTransition();
 
   const [date, setDate] = useState(defaultDate ?? getNextSundayString());
-  const [meetingType, setMeetingType] = useState<MeetingType>('regular');
-  const [presiding, setPresiding] = useState('');
-  const [conducting, setConducting] = useState('');
-  const [announcements, setAnnouncements] = useState<string[]>(['']);
+  const [meetingType, setMeetingType] = useState<MeetingType>("regular");
+  const [presiding, setPresiding] = useState("");
+  const [conducting, setConducting] = useState("");
+  const [announcements, setAnnouncements] = useState<string[]>([""]);
   const [openingHymn, setOpeningHymn] = useState<Hymn>(emptyHymn);
-  const [openingPrayer, setOpeningPrayer] = useState('');
-  const [wardBusiness, setWardBusiness] = useState<WardBusinessItem[]>([
-    { description: '' },
-  ]);
+  const [openingPrayer, setOpeningPrayer] = useState("");
+  const [wardBusiness, setWardBusiness] = useState<WardBusinessItem[]>([{ description: "" }]);
   const [stakeBusiness, setStakeBusiness] = useState(false);
   const [sacramentHymn, setSacramentHymn] = useState<Hymn>(emptyHymn);
   const [speakers, setSpeakers] = useState<SpeakerItem[]>([emptySpeaker()]);
   const [closingHymn, setClosingHymn] = useState<Hymn>(emptyHymn);
-  const [closingPrayer, setClosingPrayer] = useState('');
-  const [error, setError] = useState<string | null>(null);
-  const [submitting, setSubmitting] = useState(false);
-
-  useEffect(() => {
-    setDate(defaultDate ?? getNextSundayString());
-    setMeetingType('regular');
-    setPresiding('');
-    setConducting('');
-    setAnnouncements(['']);
-    setOpeningHymn(emptyHymn());
-    setOpeningPrayer('');
-    setWardBusiness([{ description: '' }]);
-    setStakeBusiness(false);
-    setSacramentHymn(emptyHymn());
-    setSpeakers([emptySpeaker()]);
-    setClosingHymn(emptyHymn());
-    setClosingPrayer('');
-    setError(null);
-    setSubmitting(false);
-  }, [defaultDate]);
-
-  useEffect(() => {
-    if (meetingType === 'stake') setStakeBusiness(true);
-  }, [meetingType]);
+  const [closingPrayer, setClosingPrayer] = useState("");
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
-    setError(null);
-    setSubmitting(true);
 
     const payload: CreateMeetingInput = {
       date,
@@ -153,7 +115,7 @@ export default function CreateMeetingForm({
       announcements: announcements.map((a) => a.trim()).filter(Boolean),
       openingHymn: {
         number: openingHymn.number,
-        title: openingHymn.title.trim() || 'TBD',
+        title: openingHymn.title.trim() || "TBD",
       },
       openingPrayer: openingPrayer.trim(),
       wardBusiness: wardBusiness
@@ -162,7 +124,7 @@ export default function CreateMeetingForm({
       stakeBusiness,
       sacramentHymn: {
         number: sacramentHymn.number,
-        title: sacramentHymn.title.trim() || 'TBD',
+        title: sacramentHymn.title.trim() || "TBD",
       },
       speakers: speakers
         .map((item) => ({
@@ -173,20 +135,14 @@ export default function CreateMeetingForm({
         .filter((item) => item.name),
       closingHymn: {
         number: closingHymn.number,
-        title: closingHymn.title.trim() || 'TBD',
+        title: closingHymn.title.trim() || "TBD",
       },
       closingPrayer: closingPrayer.trim(),
     };
 
-    try {
-      const meeting = await createMeetingRequest(payload);
-      onSuccess?.();
-      router.push(`/meetings/${meeting.id}`);
-      router.refresh();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Could not create meeting');
-      setSubmitting(false);
-    }
+    startTransition(() => {
+      formAction(payload);
+    });
   }
 
   return (
@@ -216,7 +172,11 @@ export default function CreateMeetingForm({
                 id="meeting-type"
                 required
                 value={meetingType}
-                onChange={(e) => setMeetingType(e.target.value as MeetingType)}
+                onChange={(e) => {
+                  const mt = e.target.value as MeetingType;
+                  setMeetingType(mt);
+                  if (mt === "stake") setStakeBusiness(true);
+                }}
                 className="mt-1 w-full"
               >
                 {meetingTypes.map((type) => (
@@ -263,7 +223,7 @@ export default function CreateMeetingForm({
             <button
               type="button"
               className="btn-secondary px-3 py-1 text-xs"
-              onClick={() => setAnnouncements((rows) => [...rows, ''])}
+              onClick={() => setAnnouncements((rows) => [...rows, ""])}
             >
               + Add
             </button>
@@ -287,11 +247,7 @@ export default function CreateMeetingForm({
                   className="shrink-0 rounded-md px-2 text-muted hover:bg-secondary/20 hover:text-foreground"
                   aria-label="Remove announcement"
                   onClick={() =>
-                    setAnnouncements((rows) =>
-                      rows.length === 1
-                        ? ['']
-                        : rows.filter((_, i) => i !== index),
-                    )
+                    setAnnouncements((rows) => (rows.length === 1 ? [""] : rows.filter((_, i) => i !== index)))
                   }
                 >
                   ✕
@@ -303,12 +259,7 @@ export default function CreateMeetingForm({
 
         <section className="space-y-4">
           <SectionTitle>Opening</SectionTitle>
-          <HymnFields
-            idPrefix="opening-hymn"
-            label="Opening Hymn"
-            value={openingHymn}
-            onChange={setOpeningHymn}
-          />
+          <HymnFields idPrefix="opening-hymn" label="Opening Hymn" value={openingHymn} onChange={setOpeningHymn} />
           <div>
             <label htmlFor="opening-prayer">Opening Prayer</label>
             <input
@@ -328,9 +279,7 @@ export default function CreateMeetingForm({
             <button
               type="button"
               className="btn-secondary px-3 py-1 text-xs"
-              onClick={() =>
-                setWardBusiness((rows) => [...rows, { description: '' }])
-              }
+              onClick={() => setWardBusiness((rows) => [...rows, { description: "" }])}
             >
               + Add
             </button>
@@ -364,9 +313,7 @@ export default function CreateMeetingForm({
                   aria-label="Remove ward business"
                   onClick={() =>
                     setWardBusiness((rows) =>
-                      rows.length === 1
-                        ? [{ description: '' }]
-                        : rows.filter((_, i) => i !== index),
+                      rows.length === 1 ? [{ description: "" }] : rows.filter((_, i) => i !== index),
                     )
                   }
                 >
@@ -398,32 +345,22 @@ export default function CreateMeetingForm({
               + Add
             </button>
           </div>
-          {meetingType === 'testimony' && (
+          {meetingType === "testimony" && (
             <p className="text-sm text-muted">
-              Testimony meeting — speakers are optional; the program can be open
-              to the congregation.
+              Testimony meeting — speakers are optional; the program can be open to the congregation.
             </p>
           )}
           <div className="space-y-3">
             {speakers.map((item, index) => (
-              <div
-                key={`speaker-${index}`}
-                className="space-y-2 rounded-md border border-border p-3"
-              >
+              <div key={`speaker-${index}`} className="space-y-2 rounded-md border border-border p-3">
                 <div className="flex items-center justify-between gap-2">
-                  <span className="text-xs font-medium uppercase tracking-wide text-muted">
-                    Item {index + 1}
-                  </span>
+                  <span className="text-xs font-medium uppercase tracking-wide text-muted">Item {index + 1}</span>
                   <button
                     type="button"
                     className="rounded-md px-2 text-sm text-muted hover:bg-secondary/20 hover:text-foreground"
                     aria-label="Remove speaker"
                     onClick={() =>
-                      setSpeakers((rows) =>
-                        rows.length === 1
-                          ? [emptySpeaker()]
-                          : rows.filter((_, i) => i !== index),
-                      )
+                      setSpeakers((rows) => (rows.length === 1 ? [emptySpeaker()] : rows.filter((_, i) => i !== index)))
                     }
                   >
                     Remove
@@ -441,7 +378,7 @@ export default function CreateMeetingForm({
                         const next = [...speakers];
                         next[index] = {
                           ...item,
-                          type: e.target.value as SpeakerItem['type'],
+                          type: e.target.value as SpeakerItem["type"],
                         };
                         setSpeakers(next);
                       }}
@@ -493,12 +430,7 @@ export default function CreateMeetingForm({
 
         <section className="space-y-4">
           <SectionTitle>Closing</SectionTitle>
-          <HymnFields
-            idPrefix="closing-hymn"
-            label="Closing Hymn"
-            value={closingHymn}
-            onChange={setClosingHymn}
-          />
+          <HymnFields idPrefix="closing-hymn" label="Closing Hymn" value={closingHymn} onChange={setClosingHymn} />
           <div>
             <label htmlFor="closing-prayer">Closing Prayer</label>
             <input
@@ -512,27 +444,19 @@ export default function CreateMeetingForm({
           </div>
         </section>
 
-        {error && (
-          <p
-            className="rounded-md bg-primary/5 px-3 py-2 text-sm text-primary"
-            role="alert"
-          >
-            {error}
+        {state?.message && (
+          <p className="rounded-md bg-primary/5 px-3 py-2 text-sm text-primary" role="alert">
+            {state.message}
           </p>
         )}
       </div>
 
       <div className="flex shrink-0 flex-col-reverse gap-2 border-t border-border px-6 py-4 sm:flex-row sm:justify-end">
-        <button
-          type="button"
-          onClick={onCancel}
-          className="btn-secondary"
-          disabled={submitting}
-        >
+        <button type="button" onClick={onCancel} className="btn-secondary" disabled={isPending}>
           Cancel
         </button>
-        <button type="submit" className="btn-primary" disabled={submitting}>
-          {submitting ? 'Saving…' : 'Save Meeting'}
+        <button type="submit" className="btn-primary" disabled={isPending}>
+          {isPending ? "Saving…" : "Save Meeting"}
         </button>
       </div>
     </form>

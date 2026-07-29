@@ -70,6 +70,7 @@ export default function CreateMeetingModal({
         </div>
 
         <CreateMeetingForm
+          key={defaultDate ?? "new"}
           defaultDate={defaultDate}
           onCancel={onClose}
           onSuccess={onClose}

@@ -26,7 +26,7 @@ export default async function EditMeetingPage({ params }: PageProps) {
         <h1 className="text-3xl font-semibold">Edit Meeting</h1>
         <p className="mt-1 text-muted">Update the meeting details for {meeting.date}.</p>
       </div>
-      <EditMeetingForm meeting={meeting} onCancel={() => {}} />
+      <EditMeetingForm meeting={meeting} />
     </div>
   );
 }

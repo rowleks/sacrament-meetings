@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { updateMeetingRequest } from "@/lib/client-api";
+import { useState, useActionState, useTransition } from "react";
+import { updateMeetingAction } from "@/lib/actions";
 import type { Hymn, MeetingType, SacramentMeeting, SpeakerItem, WardBusinessItem } from "@/lib/types";
 
 const meetingTypes: { value: MeetingType; label: string }[] = [
@@ -82,12 +81,13 @@ function HymnFields({
 
 export type EditMeetingFormProps = {
   meeting: SacramentMeeting;
-  onCancel: () => void;
+  onCancel?: () => void;
   onSuccess?: () => void;
 };
 
-export default function EditMeetingForm({ meeting, onCancel, onSuccess }: EditMeetingFormProps) {
-  const router = useRouter();
+export default function EditMeetingForm({ meeting, onCancel = () => {}, onSuccess }: EditMeetingFormProps) {
+  const [state, formAction, isPending] = useActionState(updateMeetingAction, null);
+  const [, startTransition] = useTransition();
 
   const [date, setDate] = useState(meeting.date);
   const [meetingType, setMeetingType] = useState<MeetingType>(meeting.meetingType);
@@ -108,20 +108,12 @@ export default function EditMeetingForm({ meeting, onCancel, onSuccess }: EditMe
   );
   const [closingHymn, setClosingHymn] = useState<Hymn>(meeting.closingHymn ?? emptyHymn());
   const [closingPrayer, setClosingPrayer] = useState(meeting.closingPrayer);
-  const [error, setError] = useState<string | null>(null);
-  const [submitting, setSubmitting] = useState(false);
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    if (meetingType === "stake") setStakeBusiness(true);
-  }, [meetingType]);
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
-    setError(null);
-    setSubmitting(true);
 
     const payload = {
+      id: meeting.id,
       date,
       meetingType,
       presiding,
@@ -154,15 +146,9 @@ export default function EditMeetingForm({ meeting, onCancel, onSuccess }: EditMe
       closingPrayer: closingPrayer.trim(),
     };
 
-    try {
-      await updateMeetingRequest(meeting.id, payload);
-      onSuccess?.();
-      router.push(`/meetings/${meeting.id}`);
-      router.refresh();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not update meeting");
-      setSubmitting(false);
-    }
+    startTransition(() => {
+      formAction(payload);
+    });
   }
 
   function addAnnouncement() {
@@ -191,9 +177,9 @@ export default function EditMeetingForm({ meeting, onCancel, onSuccess }: EditMe
 
   return (
     <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
-      {error && (
+      {state?.message && (
         <div className="mb-4 p-3 rounded-md bg-red-50 border border-red-200 text-red-700 text-sm" role="alert">
-          {error}
+          {state.message}
         </div>
       )}
 
@@ -221,7 +207,11 @@ export default function EditMeetingForm({ meeting, onCancel, onSuccess }: EditMe
               <select
                 id="meeting-type"
                 value={meetingType}
-                onChange={(e) => setMeetingType(e.target.value as MeetingType)}
+                onChange={(e) => {
+                  const mt = e.target.value as MeetingType;
+                  setMeetingType(mt);
+                  if (mt === "stake") setStakeBusiness(true);
+                }}
                 required
                 className="mt-1 w-full"
               >
@@ -462,11 +452,11 @@ export default function EditMeetingForm({ meeting, onCancel, onSuccess }: EditMe
       </div>
 
       <div className="flex shrink-0 items-center justify-end gap-3 border-t border-border px-6 py-4">
-        <button type="button" onClick={onCancel} className="btn-secondary">
+        <button type="button" onClick={onCancel} className="btn-secondary" disabled={isPending}>
           Cancel
         </button>
-        <button type="submit" disabled={submitting} className="btn-primary">
-          {submitting ? "Saving…" : "Save Changes"}
+        <button type="submit" disabled={isPending} className="btn-primary">
+          {isPending ? "Saving…" : "Save Changes"}
         </button>
       </div>
     </form>
