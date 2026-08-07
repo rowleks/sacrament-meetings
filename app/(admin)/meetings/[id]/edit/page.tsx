@@ -1,7 +1,13 @@
 import { fetchMeetingById } from "@/lib/api";
 import { notFound, redirect } from "next/navigation";
+import type { Metadata } from "next";
 import { auth } from "@/lib/auth";
 import EditMeetingForm from "@/components/EditMeetingForm";
+
+export const metadata: Metadata = {
+  title: "Edit Meeting",
+  robots: { index: false },
+};
 
 type PageProps = {
   params: Promise<{ id: string }>;

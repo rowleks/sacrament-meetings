@@ -15,9 +15,55 @@ const lora = Lora({
 });
 
 export const metadata: Metadata = {
-  title: "Sacrament Meeting Planner",
+  metadataBase: new URL("https://sacrament-meetings-three.vercel.app/"),
+  title: {
+    default: "Sacrament Meeting Planner",
+    template: "%s | Sacrament Meeting Planner",
+  },
   description:
     "Help church leaders and members organize and manage sacrament meetings efficiently while maintaining a sacred, respectful design tone.",
+  applicationName: "Sacrament Meeting Planner",
+  authors: [{ name: "Rowland Momoh" }],
+  creator: "Rowland Momoh",
+  publisher: "Rowland Momoh",
+  keywords: [
+    "sacrament meeting",
+    "meeting planner",
+    "LDS",
+    "ward program",
+    "meeting program",
+    "opening hymn",
+    "sacrament program",
+  ],
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "https://sacrament-meetings-three.vercel.app/",
+    siteName: "Sacrament Meeting Planner",
+    title: "Sacrament Meeting Planner",
+    description:
+      "Organize and manage sacrament meetings efficiently while maintaining a sacred, respectful design tone.",
+  },
+  twitter: {
+    card: "summary",
+    title: "Sacrament Meeting Planner",
+    description:
+      "Help church leaders and members organize and manage sacrament meetings efficiently.",
+  },
+  alternates: {
+    canonical: "/",
+  },
 };
 
 export default function RootLayout({

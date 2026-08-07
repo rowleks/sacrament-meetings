@@ -1,7 +1,13 @@
 import { redirect } from "next/navigation";
+import type { Metadata } from "next";
 import { auth } from "@/lib/auth";
 import CreateMeetingForm from "@/components/CreateMeetingForm";
 import { getNextSundayString } from "@/lib/dates";
+
+export const metadata: Metadata = {
+  title: "Create New Meeting",
+  robots: { index: false },
+};
 
 export default async function NewMeetingPage() {
   const session = await auth();

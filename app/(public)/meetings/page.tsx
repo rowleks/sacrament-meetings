@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import CreateMeetingButton from "@/components/CreateMeetingButton";
 import MeetingTypeBadge from "@/components/MeetingTypeBadge";
 import Pagination from "@/components/Pagination";
@@ -7,6 +8,11 @@ import { fetchMeetings } from "@/lib/api";
 import { formatMeetingDate, getCurrentSunday, getNextSunday } from "@/lib/dates";
 import type { SacramentMeeting } from "@/lib/types";
 import { PersonIcon, PodiumIcon } from "@/components/icons";
+
+export const metadata: Metadata = {
+  title: "All Meetings",
+  description: "Browse every sacrament meeting program for your ward.",
+};
 
 function meetingLabel(date: string): string {
   const value = new Date(date);
