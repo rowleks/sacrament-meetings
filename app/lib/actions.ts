@@ -4,6 +4,7 @@ import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createMeeting, updateMeeting } from "./meeting-db";
+import { auth } from "./auth";
 import type { CreateMeetingInput, UpdateMeetingInput } from "./types";
 
 const hymnSchema = z.object({
@@ -59,6 +60,11 @@ export type ActionState = {
 } | null;
 
 export async function createMeetingAction(prevState: ActionState, payload: CreateMeetingInput): Promise<ActionState> {
+  const session = await auth();
+  if (!session?.user) {
+    return { message: "You must be signed in to create a meeting." };
+  }
+
   const validated = createMeetingSchema.safeParse(payload);
   if (!validated.success) {
     return {
@@ -80,6 +86,11 @@ export async function updateMeetingAction(
   prevState: ActionState,
   payload: { id: number } & UpdateMeetingInput,
 ): Promise<ActionState> {
+  const session = await auth();
+  if (!session?.user) {
+    return { message: "You must be signed in to update a meeting." };
+  }
+
   const { id, ...data } = payload;
   const validated = updateMeetingSchema.safeParse(data);
   if (!validated.success) {

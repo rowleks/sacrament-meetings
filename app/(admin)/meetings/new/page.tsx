@@ -1,9 +1,14 @@
-"use client";
-
+import { redirect } from "next/navigation";
+import { auth } from "@/lib/auth";
 import CreateMeetingForm from "@/components/CreateMeetingForm";
 import { getNextSundayString } from "@/lib/dates";
 
-export default function NewMeetingPage() {
+export default async function NewMeetingPage() {
+  const session = await auth();
+  if (!session?.user) {
+    redirect("/login");
+  }
+
   return (
     <div className="space-y-8">
       <div>

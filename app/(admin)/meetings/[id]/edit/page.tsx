@@ -1,5 +1,6 @@
 import { fetchMeetingById } from "@/lib/api";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
+import { auth } from "@/lib/auth";
 import EditMeetingForm from "@/components/EditMeetingForm";
 
 type PageProps = {
@@ -7,6 +8,11 @@ type PageProps = {
 };
 
 export default async function EditMeetingPage({ params }: PageProps) {
+  const session = await auth();
+  if (!session?.user) {
+    redirect("/login");
+  }
+
   const { id } = await params;
   const meetingId = Number(id);
 
